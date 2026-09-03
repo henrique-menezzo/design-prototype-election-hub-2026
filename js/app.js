@@ -74,206 +74,38 @@
   }
 
   /* =========================== FEED FILTER ===========================
-     The collapsing pill bar from the election-hub-design prototype:
-
-       browse    [All][Articles][Shorts][Episodes][Opinion]
-       selected  [X][Articles][All Hosts v][All States v]
-
-     Picking a kind collapses the other pills (staggered outward from the one
-     you chose), the X grows in at the far left and the two secondary triggers
-     slide out from behind the pill. Clicking the active pill exits, same as the
-     X. The bar keeps a fixed height throughout, so the feed below never shifts.
-     Opinion gets no host trigger, as in the prototype. */
-  const bar = document.getElementById("filterBar");
-  const filterChips = Array.prototype.slice.call(document.querySelectorAll(".filter-chip"));
-
-  if (bar && filterChips.length) {
-    const feedCards = Array.prototype.slice.call(document.querySelectorAll(".card[data-kind]"));
-    const clearBtn = document.getElementById("filterClear");
-    const hostTrigger = document.getElementById("hostTrigger");
-    const stateTrigger = document.getElementById("stateTrigger");
-    const hostMenu = document.getElementById("hostMenu");
-    const stateMenu = document.getElementById("stateMenu");
-    const hostLabel = document.getElementById("hostLabel");
-    const stateLabel = document.getElementById("stateLabel");
-    const avatar = bar.querySelector(".host-avatar");
-
-    let kind = "all";
-    let host = null;
-    let stateScope = null;
-
-    const uniq = function (list) {
-      return list.filter(function (v, i) { return v && list.indexOf(v) === i; }).sort();
-    };
-    const HOSTS = uniq(feedCards.map(function (c) { return c.dataset.host; }));
-    const STATES = uniq(feedCards.map(function (c) { return c.dataset.stateTag; }));
-
-    function initials(name) {
-      return name.split(" ").map(function (w) { return w[0]; }).slice(0, 2).join("");
-    }
-
-    function apply() {
-      let shown = 0;
-      feedCards.forEach(function (item) {
-        const match =
-          (kind === "all" || item.dataset.kind === kind) &&
-          (!host || item.dataset.host === host) &&
-          (!stateScope || item.dataset.stateTag === stateScope);
-        if (match) {
-          item.style.setProperty("--delay", shown * 55 + "ms");
-          shown++;
-        } else {
-          item.style.removeProperty("--delay");
-        }
-        item.classList.toggle("is-filtered-out", !match);
-      });
-
-      /* a day heading with nothing left under it goes too */
-      document.querySelectorAll(".day-group").forEach(function (group) {
-        const any = group.querySelector(".card[data-kind]:not(.is-filtered-out)");
-        group.classList.toggle("is-filtered-out", !any);
-      });
-
-      let empty = document.getElementById("feedEmpty");
-      if (!shown && !empty) {
-        empty = document.createElement("p");
-        empty.id = "feedEmpty";
-        empty.className = "feed-empty";
-        empty.textContent = "Nothing here yet under these filters.";
-        bar.parentNode.parentNode.querySelector(".coverage__groups").prepend(empty);
-      } else if (shown && empty) {
-        empty.remove();
-      }
-    }
-
-    /* The pills collapse outward from the chosen one, so the eye follows a
-       wave rather than five things vanishing at once. */
-    function stagger(activeIndex) {
-      filterChips.forEach(function (chip, i) {
-        chip.style.setProperty("--delay", Math.abs(i - activeIndex) * 45 + "ms");
-      });
-    }
-
-    function setMode(selected) {
-      bar.classList.toggle("is-selected", selected);
-      bar.classList.toggle("is-browse", !selected);
-      [clearBtn, hostTrigger, stateTrigger].forEach(function (el) {
-        if (el) el.tabIndex = selected ? 0 : -1;
-      });
-      const triggers = document.getElementById("filterTriggers");
-      if (triggers) triggers.setAttribute("aria-hidden", String(!selected));
-    }
-
-    function selectKind(next) {
-      if (next === "all") return exitFilters();
-      kind = next;
-      filterChips.forEach(function (c, i) {
-        const on = c.dataset.filter === next;
-        c.classList.toggle("is-active", on);
-        c.setAttribute("aria-pressed", String(on));
-        if (on) stagger(i);
-      });
-      /* Opinion has no host trigger in the prototype */
-      bar.classList.toggle("no-host", next === "opinion");
-      setMode(true);
-      apply();
-    }
-
-    function exitFilters() {
-      kind = "all";
-      host = null;
-      stateScope = null;
-      if (hostLabel) hostLabel.textContent = "All Hosts";
-      if (stateLabel) stateLabel.textContent = "All States";
-      if (avatar) avatar.textContent = "";
-      filterChips.forEach(function (c) {
-        c.classList.remove("is-active");
-        c.setAttribute("aria-pressed", String(c.dataset.filter === "all"));
-      });
-      closeFeedMenus();
-      setMode(false);
-      apply();
-    }
+     The chips actually filter. Cards leaving fade and collapse, cards arriving
+     rise back in on a short stagger, so the list reflows instead of snapping. */
+  const filterChips = document.querySelectorAll(".filter-chip");
+  if (filterChips.length) {
+    const feedCards = document.querySelectorAll(".card[data-kind]");
 
     filterChips.forEach(function (chip) {
       chip.addEventListener("click", function () {
-        if (bar.classList.contains("is-selected") && chip.classList.contains("is-active")) exitFilters();
-        else selectKind(chip.dataset.filter);
-      });
-    });
-    if (clearBtn) clearBtn.addEventListener("click", exitFilters);
+        const want = chip.dataset.filter;
+        filterChips.forEach(function (c) {
+          c.setAttribute("aria-pressed", String(c === chip));
+        });
 
-    /* ---- secondary triggers ---- */
-    function closeFeedMenus() {
-      [[hostTrigger, hostMenu], [stateTrigger, stateMenu]].forEach(function (pair) {
-        if (!pair[0] || pair[1].hidden) return;
-        pair[1].classList.remove("is-open");
-        pair[0].setAttribute("aria-expanded", "false");
-        const menu = pair[1];
-        setTimeout(function () {
-          if (!menu.classList.contains("is-open")) menu.hidden = true;
-        }, 280);
-      });
-    }
+        let shown = 0;
+        feedCards.forEach(function (item) {
+          const match = want === "all" || item.dataset.kind === want;
+          if (match) {
+            item.style.setProperty("--delay", shown * 55 + "ms");
+            shown++;
+          } else {
+            item.style.removeProperty("--delay");
+          }
+          item.classList.toggle("is-filtered-out", !match);
+        });
 
-    function buildMenu(menu, items, current, onPick) {
-      menu.innerHTML = items.map(function (it) {
-        return '<li><button type="button" role="option" data-id="' + (it.id || "") + '"' +
-          ((it.id || null) === current ? ' aria-selected="true"' : ' aria-selected="false"') +
-          ">" + it.label + "</button></li>";
-      }).join("");
-      menu.querySelectorAll("button").forEach(function (b) {
-        b.addEventListener("click", function () {
-          onPick(b.dataset.id || null);
-          closeFeedMenus();
+        /* a day heading with nothing left under it goes too */
+        document.querySelectorAll(".day-group").forEach(function (group) {
+          const any = group.querySelector(".card[data-kind]:not(.is-filtered-out)");
+          group.classList.toggle("is-filtered-out", !any);
         });
       });
-    }
-
-    function openMenu(trigger, menu) {
-      const willOpen = !menu.classList.contains("is-open");
-      closeFeedMenus();
-      closeMenus();
-      if (!willOpen) return;
-      menu.hidden = false;
-      requestAnimationFrame(function () { menu.classList.add("is-open"); });
-      trigger.setAttribute("aria-expanded", "true");
-    }
-
-    if (hostTrigger) {
-      hostTrigger.addEventListener("click", function (e) {
-        e.stopPropagation();
-        buildMenu(hostMenu,
-          [{ id: "", label: "All Hosts" }].concat(HOSTS.map(function (h) { return { id: h, label: h }; })),
-          host,
-          function (id) {
-            host = id;
-            hostLabel.textContent = id || "All Hosts";
-            if (avatar) avatar.textContent = id ? initials(id) : "";
-            apply();
-          });
-        openMenu(hostTrigger, hostMenu);
-      });
-    }
-
-    if (stateTrigger) {
-      stateTrigger.addEventListener("click", function (e) {
-        e.stopPropagation();
-        buildMenu(stateMenu,
-          [{ id: "", label: "All States" }].concat(STATES.map(function (s) {
-            return { id: s, label: (window.EH.names[s] || s) };
-          })),
-          stateScope,
-          function (id) {
-            stateScope = id;
-            stateLabel.textContent = id ? (window.EH.names[id] || id) : "All States";
-            apply();
-          });
-        openMenu(stateTrigger, stateMenu);
-      });
-    }
-
-    document.addEventListener("click", closeFeedMenus);
+    });
   }
 
   /* =============================== MAP =============================== */
