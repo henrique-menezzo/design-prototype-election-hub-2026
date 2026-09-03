@@ -58,40 +58,24 @@
   /* DW+ band gradient */
   --gradient-brand: linear-gradient(90deg, #c23331 0%, #8e2726 100%);
 
-  /* ---- Party scale of the map (data-viz, identical in both modes) ---- */
-  --rating-safe-d: #1d4ed8;
-  --rating-likely-d: #2563eb;
-  --rating-lean-d: #93c5fd;
-  --rating-tossup: #ecddb7;
-  --rating-lean-r: #f7b0af;
-  --rating-likely-r: #ef4444;
-  --rating-safe-r: #991b1b;
-  --rating-nodata: #8f8f8f;
-  --rating-blank: #151515;
+  /* ---- Party scale of the map ----
+     Taken verbatim from the election-hub-design prototype (`colors.css`), which
+     is where this map's look comes from. Deliberately NOT the brand red: brand
+     never encodes data, party colours never style chrome. Identical in both
+     themes — saturation carries meaning, so it cannot shift with the theme. */
+  --rating-safe-d: #1041b7;
+  --rating-likely-d: #0065f4;
+  --rating-lean-d: #86c7ff;
+  --rating-tossup: #9ca3b0;
+  --rating-lean-r: #ffa0a3;
+  --rating-likely-r: #ee2532;
+  --rating-safe-r: #a8000f;
 
-  /* Colour of the abbreviation inside each state. Not Figma's: there the
-     abbreviation is a hole revealing the card background, which makes AL/AR
-     unreadable over Safe R. Here it is black or white, whichever contrasts
-     more against the fill. Worst case is 5.0:1 — above the AA minimum. */
-  --label-safe-d: #fafafa;    /* 6.4:1  */
-  --label-likely-d: #fafafa;  /* 5.0:1  */
-  --label-lean-d: #0a0909;    /* 11.0:1 */
-  --label-tossup: #0a0909;    /* 14.8:1 */
-  --label-lean-r: #0a0909;    /* 11.2:1 */
-  --label-likely-r: #0a0909;  /* 5.3:1  */
-  --label-safe-r: #fafafa;    /* 8.0:1  */
-  --label-nodata: #0a0909;    /* 6.1:1  */
-  --label-blank: #fafafa;     /* 17.5:1 */
-
-  /* ---- Motion ----
-     Nothing lands all at once: each duration matches how much it moves. The
-     curve is always the same (quick exit, calm arrival), so the whole thing
-     reads as one system rather than a pile of separate animations. */
-  --ease: cubic-bezier(.22, .61, .36, 1);
-  --dur-micro: 160ms;   /* colour, border, opacity on something small */
-  --dur-short: 260ms;   /* hover, chips, buttons */
-  --dur-medium: 420ms;  /* panel entering, staggered content */
-  --dur-long: 620ms;    /* map camera, bars growing */
+  /* Three different kinds of "no colour", kept distinct:
+     nodata = the race exists, this source published nothing
+     off    = no race here in this chamber — inert, barely above the surface */
+  --rating-nodata: #545454;
+  --rating-blank: #1f1f1f;
 
   /* ---- Seat bar ---- */
   --seatbar-track: #212121;
@@ -130,9 +114,12 @@
   --color-icon-neutral-subtlest: #8f8f8f;
   --color-icon-inverse-bold: #0a0909;
 
-  /* States with no race inherit the theme grey */
-  --rating-off: #292929;
-  --label-off: #fafafa;       /* 13.9:1 over #292929 */
+  /* States with no race: barely above the card surface, so they read as inert
+     rather than broken (they are the majority of the map for Senate). */
+  --rating-off: #1f1f1f;
+  --label-off: #a3a3a3;       /* text/neutral/subtlest, dimmed further in CSS */
+  /* Strokes match the card surface, so the shapes read as cut-outs. */
+  --state-border: #151515;
 
   /* Race modal shadow: full in dark (as in Figma, 250 blur at 100%), discreet
      in light — at 100% it turns into a grey smear across the page. */
@@ -168,8 +155,11 @@
   --color-icon-neutral-subtlest: #5c5c5c;
   --color-icon-inverse-bold: #fafafa;
 
-  --rating-off: #dfdfdf;
-  --label-off: #0a0909;       /* 14.9:1 over #dfdfdf */
+  --rating-off: #e4e4e4;
+  --label-off: #5c5c5c;
+  --rating-nodata: #bdbdbd;
+  --rating-blank: #e4e4e4;
+  --state-border: #f4f4f4;
   --panel-shadow: rgba(0, 0, 0, 0.08);
 }
 
@@ -203,8 +193,11 @@
     --color-icon-neutral-subtlest: #5c5c5c;
     --color-icon-inverse-bold: #fafafa;
 
-    --rating-off: #dfdfdf;
-    --label-off: #0a0909;
+    --rating-off: #e4e4e4;
+    --label-off: #5c5c5c;
+    --rating-nodata: #bdbdbd;
+    --rating-blank: #e4e4e4;
+    --state-border: #f4f4f4;
     --panel-shadow: rgba(0, 0, 0, 0.08);
   }
 }

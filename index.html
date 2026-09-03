@@ -44,6 +44,9 @@
         <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-search.svg);mask-image:url(assets/icons/icon_tabler-icon-search.svg)"></span>
       </button>
       <span class="header-divider desktop-only" aria-hidden="true"></span>
+      <button class="theme-toggle" type="button" id="themeToggle" aria-pressed="false">
+        <span class="sr-only" id="themeToggleLabel">Switch to light mode</span>
+      </button>
       <span class="avatar"><img src="assets/img/img0_Person-Image.png" alt="" width="20" height="20"></span>
     </div>
 
@@ -101,7 +104,6 @@
               <span class="icon icon--lg" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg);mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg)"></span>
             </button>
             <ul class="chip-menu" id="sourceMenu" role="listbox" aria-label="Source" hidden></ul>
-          </div>
         </div>
 
         <div class="map-zoom">
@@ -157,17 +159,12 @@
 
       <div class="coverage__head">
         <h2 class="coverage__title">All Election Coverage</h2>
-        <div class="filter-bar">
-          <div class="filter-row" role="group" aria-label="Filter coverage">
-            <button class="filter-chip" type="button" data-filter="all" aria-pressed="true">All</button>
-            <button class="filter-chip" type="button" data-filter="article" aria-pressed="false">Articles</button>
-            <button class="filter-chip" type="button" data-filter="short" aria-pressed="false">Shorts</button>
-            <button class="filter-chip" type="button" data-filter="episode" aria-pressed="false">Episodes</button>
-            <button class="filter-chip" type="button" data-filter="opinion" aria-pressed="false">Opinion</button>
-          </div>
-          <button class="theme-toggle" type="button" id="themeToggle" aria-pressed="false">
-            <span class="sr-only" id="themeToggleLabel">Switch to light mode</span>
-          </button>
+        <div class="filter-row" role="group" aria-label="Filter coverage">
+          <button class="filter-chip" type="button" data-filter="all" aria-pressed="true">All</button>
+          <button class="filter-chip" type="button" data-filter="article" aria-pressed="false">Articles</button>
+          <button class="filter-chip" type="button" data-filter="short" aria-pressed="false">Shorts</button>
+          <button class="filter-chip" type="button" data-filter="episode" aria-pressed="false">Episodes</button>
+          <button class="filter-chip" type="button" data-filter="opinion" aria-pressed="false">Opinion</button>
         </div>
       </div>
 
@@ -393,7 +390,6 @@
           <div class="app-promo__stores">
             <img src="assets/icons/asset_appstore.svg" alt="Download on the App Store">
             <img src="assets/icons/asset_googleplay.svg" alt="Get it on Google Play">
-          </div>
         </div>
         <div class="app-promo__qr">
           <img src="assets/icons/asset_qr.svg" alt="">

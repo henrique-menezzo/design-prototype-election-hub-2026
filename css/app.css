@@ -131,20 +131,12 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 }
 .icon-btn:hover { background: var(--color-background-neutral-subtle-hovered); }
 
-/* Light/dark control — same shape and icons as the election-hub-design
-   prototype, sitting at the end of the feed filter row. It stays put while the
-   chips scroll sideways on mobile. */
-.filter-bar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xl);
-  min-width: 0;
-}
-
+/* Light/dark control — sun/moon button from the election-hub-design prototype,
+   sized for the header it sits in. */
 .theme-toggle {
   flex: none;
-  width: 52px;
-  height: 52px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -263,9 +255,14 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 /* state painting: <g class="state r-*"> holding the shape + the abbreviation */
 .state { cursor: pointer; }
 .state .st {
-  stroke: var(--color-background-neutral-subtle);
-  stroke-width: 0.6;
-  transition: filter var(--dur-short) var(--ease);
+  /* Strokes are the card surface, so the shapes read as cut-outs — and they are
+     chrome, not geography: non-scaling-stroke keeps them 1px however far the
+     camera zooms in, instead of thickening 5x. */
+  stroke: var(--state-border);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  transition: fill var(--dur-medium) var(--ease), filter var(--dur-short) var(--ease);
 }
 .state .lbl {
   pointer-events: none;
@@ -275,7 +272,7 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.02em;
 }
-.state:hover .st { filter: brightness(1.12); }
+
 
 .r-safe-d .st { fill: var(--rating-safe-d); }
 .r-likely-d .st { fill: var(--rating-likely-d); }
@@ -298,6 +295,12 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 .r-off .lbl { fill: var(--label-off); }
 .r-nodata .lbl { fill: var(--label-nodata); }
 .r-blank .lbl { fill: var(--label-blank); }
+
+/* A state with no race is inert: dimmed label, no hover feedback, no pointer. */
+.r-off .lbl,
+.r-blank .lbl { opacity: 0.45; }
+.r-off, .r-blank { cursor: default; }
+.r-off:hover .st, .r-blank:hover .st { filter: none; }
 
 /* Race / Source chips */
 .map-chips {
@@ -846,14 +849,11 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
-    min-width: 0;                 /* deixa a faixa encolher ao lado do toggle */
-    margin-left: calc(var(--space-xl) * -1);
-    padding-left: var(--space-xl);
+    margin-inline: calc(var(--space-xl) * -1);
+    padding-inline: var(--space-xl);
   }
   .filter-row::-webkit-scrollbar { display: none; }
   .filter-chip { height: 46px; padding-inline: var(--space-xl); flex: none; }
-  .filter-bar { gap: var(--space-lg); }
-  .theme-toggle { width: 46px; height: 46px; }
 
   .coverage__groups { gap: var(--space-6xl); }
   .day-group__list { gap: var(--space-4xl); }
@@ -917,6 +917,7 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
    Selecting does not change the map's framing. Only the state changes:
    inverse-coloured outline, neighbours recede. */
 .usmap { --sel-stroke: 2; }
+.state .st { transition: fill var(--dur-medium) var(--ease), filter var(--dur-short) var(--ease); }
 .state { outline: none; }
 .state:focus-visible .st {
   stroke: var(--color-border-inverse-bold);
@@ -927,11 +928,23 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 .map-card.has-selection .state:not(.is-selected) { opacity: 0.32; }
 .map-card.has-selection .state:not(.is-selected):hover { opacity: 0.6; }
 
+/* Selection ring: `--selection` in the prototype, i.e. border/neutral/bold.
+   non-scaling-stroke keeps it the same weight at every camera scale. */
 .state.is-selected .st {
   stroke: var(--color-border-inverse-bold);
-  stroke-width: calc(var(--sel-stroke) * 1.6px);
+  stroke-width: 2.5;
   stroke-linejoin: round;
   paint-order: stroke fill;
+}
+
+/* Hover lift. SVG children cannot translateZ and paint in document order, so
+   the prototype floats a copy above; here the state is already raised to the
+   end of the group on hover-capable pointers, and the shadow plus a touch of
+   brightness carry the elevation. */
+@media (hover: hover) {
+  .state:not(.r-off):not(.r-blank):hover .st {
+    filter: brightness(1.06) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.32));
+  }
 }
 .state, .state .st { transition: opacity var(--dur-medium) var(--ease), stroke-width var(--dur-short) var(--ease); }
 
@@ -1228,7 +1241,7 @@ body.is-locked {
 .panel.is-settled .panel__scroll > *:nth-child(4) { transition-delay: 150ms; }
 
 /* recolouring the map (race/source change) is a transition too */
-.state .st { transition: fill var(--dur-medium) var(--ease), filter var(--dur-short) var(--ease); }
+
 
 @media (prefers-reduced-motion: reduce) {
   .race-row__bar,
