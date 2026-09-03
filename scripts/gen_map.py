@@ -33,8 +33,13 @@ SOURCE_TS = os.path.join(
 MAP_W, MAP_H = 975.0, 610.0
 
 # Where each breakpoint's card puts the map: (x, y, width, height).
-DESKTOP_BOX = (86.0, 42.0, 1140.0, 727.0)     # inside the 1312 x 811 card
-MOBILE_BOX = (3.0, 101.0, 355.0, 221.0)       # inside the 361 x 410 card
+DESKTOP_BOX = (32.0, 26.0, 1248.0, 759.0)     # inside the 1312 x 811 card
+MOBILE_BOX = (2.0, 96.0, 357.0, 232.0)        # inside the 361 x 410 card
+
+# Label size on screen, in CSS pixels — fixed, as in the prototype's
+# `.state-label { font-size: 11px }`. Scaling it with each state's inscribed
+# radius made Texas shout and Rhode Island whisper.
+LABEL_PX = 11.0
 
 FILL_BY_THEME = {
     "safe-d": ("#1d4ed8", "#1d4ed8"),
@@ -197,12 +202,10 @@ def build(shapes, ratings, anchors, out, viewbox, box):
         boxes[code] = [round(bx * k, 2), round(by * k, 2), round(bw * k, 2), round(bh * k, 2)]
 
         label = ""
-        # Skip states too small to hold two letters at a legible size — roughly
-        # the same nine Figma leaves unlabelled.
-        if radius * k >= 7.5:
-            size = max(7.0, min(15.0, radius * 0.85))
+        # The prototype's rule: no label where the shape cannot hold two letters.
+        if bw >= 30 and bh >= 22:
             label = ('\n  <text class="lbl" x="%.2f" y="%.2f" font-size="%.2f">%s</text>'
-                     % (ax, ay, size, code))
+                     % (ax, ay, LABEL_PX / k, code))
 
         parts.append(
             '<g class="state r-%s" data-state="%s" tabindex="0" role="button" aria-label="%s">'

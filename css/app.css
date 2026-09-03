@@ -340,9 +340,12 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 }
 .chip-menu[hidden] { display: none; }
 .chip-menu button:hover { background: var(--color-background-neutral-subtle-hovered); }
+/* Neutral, not inverted: the picked row is a step up from the panel, never a
+   white slab shouting out of a dark menu. */
 .chip-menu button[aria-selected="true"] {
-  background: var(--color-background-inverse-bold);
-  color: var(--color-text-inverse-bold);
+  background: var(--color-background-neutral-subtle-hovered);
+  color: var(--color-text-neutral-bold);
+  font-weight: var(--font-weight-semibold);
 }
 
 .chip {
@@ -1468,3 +1471,43 @@ body.is-locked {
 @media (prefers-reduced-motion: reduce) {
   .trigger-field { transition: none; }
 }
+
+
+/* ---- X: takes its slot instantly, then fades and scales in (prototype x-in) ---- */
+
+.filter-row:not(.is-selected) .filter-x { display: none; }
+
+.filter-x {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-neutral-bold);
+  border-radius: var(--radius-full);
+  color: var(--color-icon-neutral-bold);
+  animation: x-in 240ms ease both;
+  transition: background-color var(--dur-short) var(--ease);
+}
+.filter-x:hover { background: var(--color-background-neutral-subtle-hovered); }
+
+@keyframes x-in {
+  from { opacity: 0; transform: scale(0.8); }
+}
+
+@media (max-width: 900px) {
+  .filter-x { width: 46px; height: 46px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-x { animation: none; }
+}
+
+/* ---- menu rows carry the same host avatar as the trigger ---- */
+.chip-menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+#hostMenu .host-avatar { width: 30px; height: 30px; font-size: 11px; }

@@ -185,7 +185,7 @@
       const selecting = next !== "all";
       filterRow.classList.toggle("is-selected", selecting);
       if (hostField) hostField.hidden = next === "opinion";
-      [hostTrigger, stateTrigger].forEach(function (el) {
+      [hostTrigger, stateTrigger, document.getElementById("filterClear")].forEach(function (el) {
         if (el) el.tabIndex = selecting ? 0 : -1;
       });
       if (!selecting) {
@@ -241,7 +241,10 @@
       hostTrigger.addEventListener("click", function (e) {
         e.stopPropagation();
         buildMenu(hostMenu,
-          [{ id: "", label: "All Hosts" }].concat(HOSTS.map(function (h) { return { id: h, label: h }; })),
+          [{ id: "", label: "All Hosts" }].concat(HOSTS.map(function (h) {
+            const ini = h.split(" ").map(function (w) { return w[0]; }).slice(0, 2).join("");
+            return { id: h, label: '<span class="host-avatar" aria-hidden="true">' + ini + "</span>" + h };
+          })),
           host,
           function (id) {
             host = id;
@@ -282,6 +285,11 @@
         setKind(chip.classList.contains("is-active") ? "all" : chip.dataset.filter);
       });
     });
+
+    const clearBtn = document.getElementById("filterClear");
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () { setKind("all"); });
+    }
   }
 
   /* =============================== MAP =============================== */
