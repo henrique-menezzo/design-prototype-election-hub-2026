@@ -184,9 +184,11 @@
         }
       });
 
-      /* The two secondary pills slide out from behind the chosen one. Opinion
-         gets no host trigger, as in the prototype. */
+      /* The two secondary pills slide out from behind the chosen one, so the
+         distance they travel is that pill's width plus the gap — not some
+         fixed offset off the side of the row. */
       const selecting = next !== "all";
+      filterRow.style.setProperty("--slide", (active.offsetWidth + 8) + "px");
       const clearEl = document.getElementById("filterClear");
       if (!selecting && clearEl && filterRow.classList.contains("is-selected")) {
         /* the X leaves the flow first so the pills measure their true targets,
@@ -657,6 +659,12 @@
   function openPanel() {
     panel.hidden = false;
     if (scrim && mqSheet.matches) scrim.hidden = false;
+    /* The panel goes from display:none (via [hidden]) straight to visible. One
+       rAF is not enough: the browser can batch that with the class below into a
+       single style pass, and the sheet simply appears instead of rising.
+       Reading a layout property forces the closed state to be committed first,
+       so there is something to transition FROM. */
+    void panel.offsetHeight;
     requestAnimationFrame(function () {
       panel.classList.add("is-open");
       if (scrim && mqSheet.matches) scrim.classList.add("is-open");

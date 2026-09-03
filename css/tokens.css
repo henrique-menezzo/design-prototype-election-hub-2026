@@ -77,6 +77,16 @@
   --rating-nodata: #545454;
   --rating-blank: #1f1f1f;
 
+  /* ---- Motion ----
+     Nothing lands all at once: each duration matches how much it moves. The
+     curve is always the same (quick exit, calm arrival), so the whole thing
+     reads as one system rather than a pile of separate animations. */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-micro: 160ms;   /* colour, border, opacity on something small */
+  --dur-short: 260ms;   /* hover, chips, buttons */
+  --dur-medium: 420ms;  /* panel entering, staggered content */
+  --dur-long: 620ms;    /* map camera, bars growing */
+
   /* ---- Seat bar ---- */
   --seatbar-track: #212121;
   --seatbar-dem: #0044c9;

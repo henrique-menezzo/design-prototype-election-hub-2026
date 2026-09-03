@@ -987,7 +987,12 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   overflow: hidden;
   opacity: 0;
   transform: translateY(10px) scale(0.985);
-  transition: opacity var(--dur-medium) var(--ease), transform var(--dur-medium) var(--ease);
+  transition:
+    opacity var(--dur-medium) var(--ease),
+    transform var(--dur-medium) var(--ease),
+    background-color var(--dur-medium) var(--ease),
+    border-color var(--dur-medium) var(--ease),
+    color var(--dur-medium) var(--ease);
 }
 .panel[hidden] { display: none; }
 .panel.is-open { opacity: 1; transform: none; }
@@ -1180,7 +1185,17 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
     transform: translateY(100%);
     transition: transform var(--dur-long) var(--ease), opacity var(--dur-short) var(--ease);
   }
-  .panel.is-open { transform: translateY(0); }
+  /* An animation, not just the transition: the sheet comes from display:none,
+     and a transition out of that can be swallowed by the same style pass, which
+     made it appear instead of rise. */
+  .panel.is-open {
+    transform: translateY(0);
+    animation: sheet-in var(--dur-long) var(--ease) both;
+  }
+
+  @keyframes sheet-in {
+    from { transform: translateY(100%); }
+  }
 
   .panel__top { padding: var(--space-lg) var(--space-xl); }
   .panel__crumb { font-size: var(--font-size-md); }
@@ -1257,9 +1272,12 @@ body.is-locked {
  * Motion layer — nothing changes state all at once
  * ================================================================== */
 
-/* surfaces follow the theme switch instead of flashing */
+/* Surfaces follow the theme switch instead of flashing.
+   .panel and .filter-chip are deliberately NOT here: this shorthand lands after
+   their own rules and would wipe the transform transitions they depend on —
+   which is exactly what stopped the mobile sheet from rising and made the pills
+   snap. Their own rules carry the colour transition instead. */
 .map-card,
-.panel,
 .chip,
 .chip-menu,
 .map-zoom__btn,
@@ -1269,7 +1287,6 @@ body.is-locked {
 .site-header,
 .site-footer,
 .game-bar,
-.filter-chip,
 .coverage__divider,
 .day-group__label,
 .seatbar {
@@ -1384,12 +1401,13 @@ body.is-locked {
   opacity: 0;
   border-color: transparent;
   pointer-events: none;
-  transition: opacity 240ms ease, border-color 160ms ease;
 }
 
 /* The chosen pill rides into its new slot. */
 .filter-chip.is-flipping {
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-duration: 240ms, 160ms, var(--dur-short), var(--dur-short), 320ms;
+  transition-timing-function: ease, ease, var(--ease), var(--ease),
+    cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   z-index: 2;
 }
@@ -1418,11 +1436,13 @@ body.is-locked {
 
 .filter-row:not(.is-selected) .trigger-field {
   opacity: 0;
-  transform: translateX(-56px);
+  transform: translateX(calc(var(--slide, 90px) * -1));
   max-width: 0;
   margin-left: calc(var(--space-md) * -1);
   pointer-events: none;
+  /* leaving mirrors arriving — same curve, same duration, no delay */
   transition-delay: 0ms;
+  transition-duration: 200ms, 320ms, 320ms, 320ms;
 }
 
 .host-trigger {
