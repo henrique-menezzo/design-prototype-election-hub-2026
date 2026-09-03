@@ -486,6 +486,9 @@
     panel.classList.remove("is-settled");
     renderPanel(code);
     openPanel();
+    /* One frame later, so forcing layout for the bars does not land in the same
+       task that started the sheet's own transition and cut it short. */
+    requestAnimationFrame(growBars);
     focusSelected(code);
   }
 
@@ -682,11 +685,12 @@
        Reading a layout property forces the closed state to be committed first,
        so there is something to transition FROM. */
     void panel.offsetHeight;
-    requestAnimationFrame(function () {
-      panel.classList.add("is-open");
-      if (scrim && mqSheet.matches) scrim.classList.add("is-open");
-      syncZoomButtons();
-    });
+    /* Synchronously, not in a rAF: the forced reflow above already commits the
+       closed state, so there is something to transition from — and a throttled
+       frame can no longer swallow the opening. */
+    panel.classList.add("is-open");
+    if (scrim && mqSheet.matches) scrim.classList.add("is-open");
+    syncZoomButtons();
     lockScroll(mqSheet.matches);
     syncZoomButtons();
   }
@@ -820,14 +824,19 @@
     if (sc) sc.scrollTop = 0;
 
     /* bars start at zero and grow left to right, cascading */
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        panel.querySelectorAll(".race-row__bar").forEach(function (b) {
-          b.style.width = b.dataset.w + "%";
-        });
-        panel.classList.add("is-settled");
-      });
+    /* The bars are grown by growBars(), AFTER the panel is on screen: setting
+       their width while the panel is still display:none skips the transition
+       and they simply appear at full length. */
+  }
+
+  /* Commit the zero-width state, then set the real widths so the bars grow
+     from the left instead of appearing. */
+  function growBars() {
+    void panel.offsetHeight;
+    panel.querySelectorAll(".race-row__bar").forEach(function (b) {
+      b.style.width = b.dataset.w + "%";
     });
+    panel.classList.add("is-settled");
   }
 
   /* --------------------- mouse / touch events ---------------------- */
