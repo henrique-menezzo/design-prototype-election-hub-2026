@@ -1,0 +1,219 @@
+/* ------------------------------------------------------------------ *
+ * Daily Wire — Election Hub
+ * Design tokens read straight from Figma ("DW WIP Q3 (2026)" →
+ * page "[CO] - Election Hub" → section "Latest").
+ * Every custom property below maps 1:1 to a semantic variable in the file;
+ * each mode's value (Dark / Light) is the one resolved there.
+ * ------------------------------------------------------------------ */
+
+:root {
+  /* ---- Spacing (semantic/spacing/*) ---- */
+  --space-none: 0px;
+  --space-xxs: 2px;
+  --space-xs: 4px;
+  --space-sm: 6px;
+  --space-md: 8px;
+  --space-lg: 12px;
+  --space-xl: 16px;
+  --space-2xl: 20px;
+  --space-3xl: 24px;
+  --space-4xl: 32px;
+  --space-5xl: 40px;
+  --space-6xl: 48px;
+  --space-8xl: 64px;
+  --space-9xl: 72px;
+
+  /* ---- Radius (semantic/border-radius/*) ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 999px;
+  --radius-pill: 9999px;
+
+  /* ---- Type (semantic/font-size/*) ---- */
+  --font-size-xxs: 10px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-size-3xl: 40px;
+
+  --font-family-default: "Libre Franklin", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-family-ui: "Inter", "Libre Franklin", system-ui, sans-serif;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-extrabold: 800;
+
+  /* ---- Colours that are fixed in both modes ---- */
+  --color-background-brand-bold: #c23331;
+  --color-icon-brand-bold: #db3d3b;
+  --color-link-brand-bold: #eb605e;
+  --color-text-always-light: #fafafa;
+  --color-overlay-neutral-strong: #000000;
+
+  /* DW+ band gradient */
+  --gradient-brand: linear-gradient(90deg, #c23331 0%, #8e2726 100%);
+
+  /* ---- Party scale of the map (data-viz, identical in both modes) ---- */
+  --rating-safe-d: #1d4ed8;
+  --rating-likely-d: #2563eb;
+  --rating-lean-d: #93c5fd;
+  --rating-tossup: #ecddb7;
+  --rating-lean-r: #f7b0af;
+  --rating-likely-r: #ef4444;
+  --rating-safe-r: #991b1b;
+  --rating-nodata: #8f8f8f;
+  --rating-blank: #151515;
+
+  /* Colour of the abbreviation inside each state. Not Figma's: there the
+     abbreviation is a hole revealing the card background, which makes AL/AR
+     unreadable over Safe R. Here it is black or white, whichever contrasts
+     more against the fill. Worst case is 5.0:1 — above the AA minimum. */
+  --label-safe-d: #fafafa;    /* 6.4:1  */
+  --label-likely-d: #fafafa;  /* 5.0:1  */
+  --label-lean-d: #0a0909;    /* 11.0:1 */
+  --label-tossup: #0a0909;    /* 14.8:1 */
+  --label-lean-r: #0a0909;    /* 11.2:1 */
+  --label-likely-r: #0a0909;  /* 5.3:1  */
+  --label-safe-r: #fafafa;    /* 8.0:1  */
+  --label-nodata: #0a0909;    /* 6.1:1  */
+  --label-blank: #fafafa;     /* 17.5:1 */
+
+  /* ---- Motion ----
+     Nothing lands all at once: each duration matches how much it moves. The
+     curve is always the same (quick exit, calm arrival), so the whole thing
+     reads as one system rather than a pile of separate animations. */
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --dur-micro: 160ms;   /* colour, border, opacity on something small */
+  --dur-short: 260ms;   /* hover, chips, buttons */
+  --dur-medium: 420ms;  /* panel entering, staggered content */
+  --dur-long: 620ms;    /* map camera, bars growing */
+
+  /* ---- Seat bar ---- */
+  --seatbar-track: #212121;
+  --seatbar-dem: #0044c9;
+  --seatbar-toss: #9ca3b0;
+  --seatbar-rep: #d71e28;
+}
+
+/* ============================ DARK (default) ============================ */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-background-neutral-bold: #0a0909;
+  --color-background-neutral-medium: #151515;
+  --color-background-neutral-subtle: #151515;
+  --color-background-neutral-subtle-hovered: #292929;
+  --color-background-neutral-subtlest: #292929;
+  --color-background-inverse-bold: #fafafa;
+  --color-background-brand-subtlest: #741716;
+  --color-background-brand-subtlest-hovered: #8f201e;
+
+  --color-border-neutral-bold: #292929;
+  --color-border-neutral-subtle: #424242;
+  --color-border-neutral-strong: #0a0909;
+  --color-border-inverse-bold: #fafafa;
+
+  --color-text-neutral-bold: #fafafa;
+  --color-text-neutral-subtle: #dfdfdf;
+  --color-text-neutral-subtlest: #8f8f8f;
+  --color-text-inverse-bold: #0a0909;
+  --color-text-info-bold: #60a5fa;
+
+  --color-icon-neutral-bold: #fafafa;
+  --color-icon-neutral-bold-disabled: #424242;
+  --color-icon-neutral-subtlest: #8f8f8f;
+  --color-icon-inverse-bold: #0a0909;
+
+  /* States with no race inherit the theme grey */
+  --rating-off: #292929;
+  --label-off: #fafafa;       /* 13.9:1 over #292929 */
+
+  /* Race modal shadow: full in dark (as in Figma, 250 blur at 100%), discreet
+     in light — at 100% it turns into a grey smear across the page. */
+  --panel-shadow: rgba(0, 0, 0, 1);
+}
+
+/* ============================== LIGHT ============================== */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-background-neutral-bold: #fafafa;
+  --color-background-neutral-medium: #ffffff;
+  --color-background-neutral-subtle: #f0f0f0;
+  --color-background-neutral-subtle-hovered: #dfdfdf;
+  --color-background-neutral-subtlest: #dfdfdf;
+  --color-background-inverse-bold: #0a0909;
+  --color-background-brand-subtlest: #fbd7d7;
+  --color-background-brand-subtlest-hovered: #f7b0af;
+
+  --color-border-neutral-bold: #d1d1d1;
+  --color-border-neutral-subtle: #d1d1d1;
+  --color-border-neutral-strong: #fafafa;
+  --color-border-inverse-bold: #0a0909;
+
+  --color-text-neutral-bold: #0a0909;
+  --color-text-neutral-subtle: #5c5c5c;
+  --color-text-neutral-subtlest: #5c5c5c;
+  --color-text-inverse-bold: #fafafa;
+  --color-text-info-bold: #1d4ed8;
+
+  --color-icon-neutral-bold: #0a0909;
+  --color-icon-neutral-bold-disabled: #8f8f8f;
+  --color-icon-neutral-subtlest: #5c5c5c;
+  --color-icon-inverse-bold: #fafafa;
+
+  --rating-off: #dfdfdf;
+  --label-off: #0a0909;       /* 14.9:1 over #dfdfdf */
+  --panel-shadow: rgba(0, 0, 0, 0.08);
+}
+
+/* With no explicit choice, follow the system */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+
+    --color-background-neutral-bold: #fafafa;
+    --color-background-neutral-medium: #ffffff;
+    --color-background-neutral-subtle: #f0f0f0;
+    --color-background-neutral-subtle-hovered: #dfdfdf;
+    --color-background-neutral-subtlest: #dfdfdf;
+    --color-background-inverse-bold: #0a0909;
+    --color-background-brand-subtlest: #fbd7d7;
+    --color-background-brand-subtlest-hovered: #f7b0af;
+
+    --color-border-neutral-bold: #d1d1d1;
+    --color-border-neutral-subtle: #d1d1d1;
+    --color-border-neutral-strong: #fafafa;
+    --color-border-inverse-bold: #0a0909;
+
+    --color-text-neutral-bold: #0a0909;
+    --color-text-neutral-subtle: #5c5c5c;
+    --color-text-neutral-subtlest: #5c5c5c;
+    --color-text-inverse-bold: #fafafa;
+    --color-text-info-bold: #1d4ed8;
+
+    --color-icon-neutral-bold: #0a0909;
+    --color-icon-neutral-bold-disabled: #8f8f8f;
+    --color-icon-neutral-subtlest: #5c5c5c;
+    --color-icon-inverse-bold: #fafafa;
+
+    --rating-off: #dfdfdf;
+    --label-off: #0a0909;
+    --panel-shadow: rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Party colours used by the bars in the state panel
+   (Drawer in Figma: fills at 15% opacity) */
+:root {
+  --party-rep: #d71e28;
+  --party-dem: #0057fe;
+  --party-ind: #31c400;
+  --party-bar-alpha: 0.15;
+}
