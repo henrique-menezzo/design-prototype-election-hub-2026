@@ -60,6 +60,41 @@
     tick();
   }
 
+  /* =========================== FEED FILTER ===========================
+     The chips actually filter. Cards leaving fade and collapse, cards arriving
+     rise back in on a short stagger, so the list reflows instead of snapping. */
+  const filterChips = document.querySelectorAll(".filter-chip");
+  if (filterChips.length) {
+    const feedCards = document.querySelectorAll(".card[data-kind]");
+
+    filterChips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        const want = chip.dataset.filter;
+        filterChips.forEach(function (c) {
+          c.setAttribute("aria-pressed", String(c === chip));
+        });
+
+        let shown = 0;
+        feedCards.forEach(function (item) {
+          const match = want === "all" || item.dataset.kind === want;
+          if (match) {
+            item.style.setProperty("--delay", shown * 55 + "ms");
+            shown++;
+          } else {
+            item.style.removeProperty("--delay");
+          }
+          item.classList.toggle("is-filtered-out", !match);
+        });
+
+        /* a day heading with nothing left under it goes too */
+        document.querySelectorAll(".day-group").forEach(function (group) {
+          const any = group.querySelector(".card[data-kind]:not(.is-filtered-out)");
+          group.classList.toggle("is-filtered-out", !any);
+        });
+      });
+    });
+  }
+
   /* =============================== MAP =============================== */
 
   const card = document.querySelector(".map-card");
@@ -232,6 +267,8 @@
     selected = null;
     card.classList.remove("has-selection");
     closePanel();
+    /* selecting zoomed the map in, so closing gives the whole map back */
+    if (!mqSheet.matches) resetView();
   }
 
   function step(dir) {

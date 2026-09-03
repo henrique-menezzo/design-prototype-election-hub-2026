@@ -254,7 +254,14 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   stroke-width: 0.6;
   transition: filter var(--dur-short) var(--ease);
 }
-.state .lbl { pointer-events: none; }
+.state .lbl {
+  pointer-events: none;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.02em;
+}
 .state:hover .st { filter: brightness(1.12); }
 
 .r-safe-d .st { fill: var(--rating-safe-d); }
@@ -1296,4 +1303,34 @@ body.is-locked {
 
 @media (prefers-reduced-motion: reduce) {
   #countdown { min-width: 0; }
+}
+
+/* ---------------------- feed filter ---------------------- */
+
+.card[data-kind],
+.day-group {
+  transition:
+    opacity var(--dur-medium) var(--ease),
+    transform var(--dur-medium) var(--ease),
+    max-height var(--dur-medium) var(--ease),
+    margin var(--dur-medium) var(--ease);
+  transition-delay: var(--delay, 0ms);
+  max-height: 600px;
+}
+
+.card[data-kind].is-filtered-out,
+.day-group.is-filtered-out {
+  opacity: 0;
+  transform: translateY(-6px);
+  max-height: 0;
+  margin-block: calc(var(--space-4xl) / -2);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.day-group.is-filtered-out { margin-block: calc(var(--space-9xl) / -2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card[data-kind],
+  .day-group { transition: none; }
 }

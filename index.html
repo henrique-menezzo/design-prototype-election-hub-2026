@@ -163,11 +163,11 @@
       <div class="coverage__head">
         <h2 class="coverage__title">All Election Coverage</h2>
         <div class="filter-row" role="group" aria-label="Filter coverage">
-          <button class="filter-chip" type="button" aria-pressed="true">All</button>
-          <button class="filter-chip" type="button" aria-pressed="false">Articles</button>
-          <button class="filter-chip" type="button" aria-pressed="false">Shorts</button>
-          <button class="filter-chip" type="button" aria-pressed="false">Episodes</button>
-          <button class="filter-chip" type="button" aria-pressed="false">Opinion</button>
+          <button class="filter-chip" type="button" data-filter="all" aria-pressed="true">All</button>
+          <button class="filter-chip" type="button" data-filter="article" aria-pressed="false">Articles</button>
+          <button class="filter-chip" type="button" data-filter="short" aria-pressed="false">Shorts</button>
+          <button class="filter-chip" type="button" data-filter="episode" aria-pressed="false">Episodes</button>
+          <button class="filter-chip" type="button" data-filter="opinion" aria-pressed="false">Opinion</button>
         </div>
       </div>
 
@@ -177,7 +177,7 @@
           <h3 class="day-group__label">Today · Wednesday, August 19</h3>
           <div class="day-group__list">
 
-            <article class="card">
+            <article class="card" data-kind="episode">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Ben Shapiro Reacts to Michelle Obama X Call Her Daddy Camps</h4>
@@ -199,7 +199,7 @@
               </div>
             </article>
 
-            <article class="card">
+            <article class="card" data-kind="article">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Three Counties That Decide Pennsylvania</h4>
@@ -221,7 +221,7 @@
               </div>
             </article>
 
-            <article class="card">
+            <article class="card" data-kind="article">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Inside The 29: How The Closest House Races Were Chosen</h4>
@@ -243,7 +243,7 @@
               </div>
             </article>
 
-            <article class="card">
+            <article class="card" data-kind="article">
               <div class="card__body">
                 <div class="card__text">
                   <span class="card__live">Live Updates</span>
@@ -272,7 +272,7 @@
         <section class="day-group">
           <h3 class="day-group__label">Yesterday · Tuesday, August 18</h3>
           <div class="day-group__list">
-            <article class="card">
+            <article class="card" data-kind="short">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Maine Senate Race Tightens As Outside Money Pours Into Both Camps</h4>
@@ -300,7 +300,7 @@
         <section class="day-group">
           <div class="day-group__list">
 
-            <article class="card">
+            <article class="card" data-kind="episode">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Ben Shapiro Reacts to Michelle Obama X Call Her Daddy Camps</h4>
@@ -322,7 +322,7 @@
               </div>
             </article>
 
-            <article class="card">
+            <article class="card" data-kind="opinion">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Inside The 29: How The Closest House Races Were Chosen</h4>
