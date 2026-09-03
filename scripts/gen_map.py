@@ -36,10 +36,16 @@ MAP_W, MAP_H = 975.0, 610.0
 DESKTOP_BOX = (32.0, 26.0, 1248.0, 759.0)     # inside the 1312 x 811 card
 MOBILE_BOX = (2.0, 96.0, 357.0, 232.0)        # inside the 361 x 410 card
 
-# Label size on screen, in CSS pixels — fixed, as in the prototype's
-# `.state-label { font-size: 11px }`. Scaling it with each state's inscribed
-# radius made Texas shout and Rhode Island whisper.
-LABEL_PX = 11.0
+# Label size on screen, in CSS pixels, and the smallest on-screen box that may
+# carry one. Fixed per breakpoint rather than per state — sizing each label off
+# its own inscribed radius made Texas shout and Rhode Island whisper.
+#
+# The two breakpoints need different numbers: the mobile card only gives the map
+# 355x232, about a third of the desktop width, so an 11px label there covers
+# half a state. Smaller type AND a stricter cut, both measured in screen pixels
+# so the rule follows the map's real size instead of the path units.
+DESKTOP_LABEL = (11.0, 34.0, 22.0)   # size, min box width, min box height
+MOBILE_LABEL = (7.0, 24.0, 15.0)
 
 FILL_BY_THEME = {
     "safe-d": ("#1d4ed8", "#1d4ed8"),
@@ -191,8 +197,9 @@ def fit(box):
     return round(k, 5), round(x + (w - MAP_W * k) / 2, 2), round(y + (h - MAP_H * k) / 2, 2)
 
 
-def build(shapes, ratings, anchors, out, viewbox, box):
+def build(shapes, ratings, anchors, out, viewbox, box, label):
     k, ox, oy = fit(box)
+    label_px, min_w, min_h = label
     parts, boxes = [], {}
 
     for s in shapes:
@@ -201,16 +208,17 @@ def build(shapes, ratings, anchors, out, viewbox, box):
         bx, by, bw, bh, ax, ay, radius = anchors[code]
         boxes[code] = [round(bx * k, 2), round(by * k, 2), round(bw * k, 2), round(bh * k, 2)]
 
-        label = ""
-        # The prototype's rule: no label where the shape cannot hold two letters.
-        if bw >= 30 and bh >= 22:
-            label = ('\n  <text class="lbl" x="%.2f" y="%.2f" font-size="%.2f">%s</text>'
-                     % (ax, ay, LABEL_PX / k, code))
+        text = ""
+        # No label where the shape, at the size it is actually drawn, cannot
+        # hold two letters.
+        if bw * k >= min_w and bh * k >= min_h:
+            text = ('\n  <text class="lbl" x="%.2f" y="%.2f" font-size="%.2f">%s</text>'
+                    % (ax, ay, label_px / k, code))
 
         parts.append(
             '<g class="state r-%s" data-state="%s" tabindex="0" role="button" aria-label="%s">'
             '\n  <path class="st" d="%s"/>%s\n</g>'
-            % (cls, code, code, s["d"], label)
+            % (cls, code, code, s["d"], text)
         )
 
     svg = (
@@ -244,9 +252,11 @@ if __name__ == "__main__":
                             round(ax, 2), round(ay, 2), radius)
 
     desktop, d_origin = build(shapes, ratings, anchors,
-                              OUT + "map-desktop.svg", "0 0 1312 811", DESKTOP_BOX)
+                              OUT + "map-desktop.svg", "0 0 1312 811", DESKTOP_BOX,
+                              DESKTOP_LABEL)
     mobile, m_origin = build(shapes, ratings, anchors,
-                             OUT + "map-mobile.svg", "0 0 361 410", MOBILE_BOX)
+                             OUT + "map-mobile.svg", "0 0 361 410", MOBILE_BOX,
+                             MOBILE_LABEL)
 
     json.dump({"desktop": desktop, "mobile": mobile,
                "desktop_origin": list(d_origin), "mobile_origin": list(m_origin)},
