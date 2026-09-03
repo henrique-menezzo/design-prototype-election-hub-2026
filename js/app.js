@@ -147,16 +147,20 @@
       return filterChips.map(function (c) { return c.getBoundingClientRect().left - base; });
     }
 
-    function flip(active, before, after) {
-      const dx = before - after;
-      if (!dx) return;
-      active.style.transition = "none";
-      active.style.transform = "translateX(" + dx + "px)";
-      requestAnimationFrame(function () {
-        active.style.transition = "";
-        active.classList.add("is-flipping");
-        active.style.transform = "";
-        setTimeout(function () { active.classList.remove("is-flipping"); }, 340);
+    /* FLIP every pill that moved, in both directions — going in AND coming
+       back. Only animating the chosen one made the return snap. */
+    function flip(before, after) {
+      filterChips.forEach(function (c, i) {
+        const dx = before[i] - after[i];
+        if (!dx || c.classList.contains("is-fading")) return;
+        c.style.transition = "none";
+        c.style.transform = "translateX(" + dx + "px)";
+        requestAnimationFrame(function () {
+          c.style.transition = "";
+          c.classList.add("is-flipping");
+          c.style.transform = "";
+          setTimeout(function () { c.classList.remove("is-flipping"); }, 340);
+        });
       });
     }
 
@@ -183,6 +187,13 @@
       /* The two secondary pills slide out from behind the chosen one. Opinion
          gets no host trigger, as in the prototype. */
       const selecting = next !== "all";
+      const clearEl = document.getElementById("filterClear");
+      if (!selecting && clearEl && filterRow.classList.contains("is-selected")) {
+        /* the X leaves the flow first so the pills measure their true targets,
+           then fades out in place instead of blinking off */
+        clearEl.classList.add("is-out");
+        setTimeout(function () { clearEl.classList.remove("is-out"); }, 240);
+      }
       filterRow.classList.toggle("is-selected", selecting);
       if (hostField) hostField.hidden = next === "opinion";
       [hostTrigger, stateTrigger, document.getElementById("filterClear")].forEach(function (el) {
@@ -197,7 +208,7 @@
         closeFeedMenus();
       }
 
-      flip(active, before[filterChips.indexOf(active)], offsets()[filterChips.indexOf(active)]);
+      flip(before, offsets());
       applyFilter();
     }
 
@@ -534,7 +545,7 @@
      map's rating distribution, and the bar follows in the same proportion —
      each bucket's state count against the baseline count. */
   const SEAT_BASE = { dem: 470, toss: 60, rep: 1000 };
-  const COUNT_BASE = { dem: 13, toss: 6, rep: 19 };
+  const COUNT_BASE = { dem: 5, toss: 6, rep: 4 };
   /* the frame's widths (639 / 18 / 654 of 1312) — in the file the bar is not
      the proportion of the numbers beside it, it is the current seat
      composition; so it is the baseline and moves along without becoming
@@ -805,7 +816,69 @@
     };
   }
 
+  /* ------------------------------ tooltip ------------------------------
+     Follows the pointer inside the card, clamped so it never leaves the frame.
+     Pointer only: on touch the tap opens the panel, which says all of this and
+     more. */
+  const tip = document.getElementById("mapTip");
+
+  function showTip(code, ev) {
+    if (!tip || !svg) return;
+    const g = svg.querySelector('[data-state="' + code + '"]');
+    const rating = g.getAttribute("class").match(/r-([a-z-]+)/)[1];
+    const onBallot = rating !== "off" && rating !== "blank";
+    const d = window.EH.build(code, rating, race, source);
+
+    tip.innerHTML =
+      '<b>' + d.name + "</b>" +
+      (onBallot
+        ? "<span>" + d.ratingLabel + " — " + d.margin + "</span>" +
+          "<span>" + d.source + " " + d.sourceKind.toLowerCase() + " · " + d.updated.toLowerCase() + "</span>" +
+          (d.districts.length
+            ? "<span>" + d.districts.length + " curated of " +
+              (d.districts.length + 5) + " districts — click to zoom in</span>"
+            : "")
+        : "<span>No 2026 election in this chamber</span>");
+
+    tip.hidden = false;
+    tip.setAttribute("aria-hidden", "false");
+    moveTip(ev);
+    requestAnimationFrame(function () { tip.classList.add("is-on"); });
+  }
+
+  function moveTip(ev) {
+    if (!tip || tip.hidden) return;
+    const r = card.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const h = tip.offsetHeight;
+    let x = ev.clientX - r.left + 16;
+    let y = ev.clientY - r.top + 16;
+    if (x + w > r.width - 12) x = ev.clientX - r.left - w - 16;
+    if (y + h > r.height - 12) y = ev.clientY - r.top - h - 16;
+    tip.style.transform = "translate(" + Math.max(12, x) + "px," + Math.max(12, y) + "px)";
+  }
+
+  function hideTip() {
+    if (!tip) return;
+    tip.classList.remove("is-on");
+    tip.setAttribute("aria-hidden", "true");
+    setTimeout(function () { if (!tip.classList.contains("is-on")) tip.hidden = true; }, 200);
+  }
+
   function bindMap() {
+    if (window.matchMedia("(hover: hover)").matches) {
+      svg.addEventListener("pointerover", function (ev) {
+        const p = ev.target.closest(".state");
+        if (p) showTip(p.dataset.state, ev);
+      });
+      svg.addEventListener("pointermove", function (ev) {
+        if (ev.target.closest(".state")) moveTip(ev);
+        else hideTip();
+      });
+      svg.addEventListener("pointerleave", hideTip);
+      card.addEventListener("pointerdown", hideTip);
+    }
+
     svg.addEventListener("click", function (ev) {
       const p = ev.target.closest(".state");
       if (!p) return;
