@@ -131,17 +131,30 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 }
 .icon-btn:hover { background: var(--color-background-neutral-subtle-hovered); }
 
-.theme-toggle {
-  display: inline-flex;
+/* Light/dark control — same shape and icons as the election-hub-design
+   prototype, sitting at the end of the feed filter row. It stays put while the
+   chips scroll sideways on mobile. */
+.filter-bar {
+  display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  height: 32px;
-  padding-inline: var(--space-lg);
-  border: 1px solid var(--color-border-neutral-bold);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-neutral-bold);
+  gap: var(--space-xl);
+  min-width: 0;
 }
+
+.theme-toggle {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-neutral-bold);
+  border-radius: var(--radius-full);
+  background: var(--color-background-neutral-medium);
+  color: var(--color-icon-neutral-bold);
+  cursor: pointer;
+}
+.theme-toggle:hover { background: var(--color-background-neutral-subtle-hovered); }
 
 .mobile-only { display: none; }
 
@@ -833,11 +846,14 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
-    margin-inline: calc(var(--space-xl) * -1);
-    padding-inline: var(--space-xl);
+    min-width: 0;                 /* deixa a faixa encolher ao lado do toggle */
+    margin-left: calc(var(--space-xl) * -1);
+    padding-left: var(--space-xl);
   }
   .filter-row::-webkit-scrollbar { display: none; }
   .filter-chip { height: 46px; padding-inline: var(--space-xl); flex: none; }
+  .filter-bar { gap: var(--space-lg); }
+  .theme-toggle { width: 46px; height: 46px; }
 
   .coverage__groups { gap: var(--space-6xl); }
   .day-group__list { gap: var(--space-4xl); }

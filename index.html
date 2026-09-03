@@ -44,11 +44,6 @@
         <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-search.svg);mask-image:url(assets/icons/icon_tabler-icon-search.svg)"></span>
       </button>
       <span class="header-divider desktop-only" aria-hidden="true"></span>
-      <button class="theme-toggle" type="button" id="themeToggle" aria-pressed="false">
-        <span aria-hidden="true" id="themeToggleIcon">◑</span>
-        <span class="desktop-only" id="themeToggleLabel">Light</span>
-        <span class="sr-only">Toggle light and dark theme</span>
-      </button>
       <span class="avatar"><img src="assets/img/img0_Person-Image.png" alt="" width="20" height="20"></span>
     </div>
 
@@ -162,12 +157,17 @@
 
       <div class="coverage__head">
         <h2 class="coverage__title">All Election Coverage</h2>
-        <div class="filter-row" role="group" aria-label="Filter coverage">
-          <button class="filter-chip" type="button" data-filter="all" aria-pressed="true">All</button>
-          <button class="filter-chip" type="button" data-filter="article" aria-pressed="false">Articles</button>
-          <button class="filter-chip" type="button" data-filter="short" aria-pressed="false">Shorts</button>
-          <button class="filter-chip" type="button" data-filter="episode" aria-pressed="false">Episodes</button>
-          <button class="filter-chip" type="button" data-filter="opinion" aria-pressed="false">Opinion</button>
+        <div class="filter-bar">
+          <div class="filter-row" role="group" aria-label="Filter coverage">
+            <button class="filter-chip" type="button" data-filter="all" aria-pressed="true">All</button>
+            <button class="filter-chip" type="button" data-filter="article" aria-pressed="false">Articles</button>
+            <button class="filter-chip" type="button" data-filter="short" aria-pressed="false">Shorts</button>
+            <button class="filter-chip" type="button" data-filter="episode" aria-pressed="false">Episodes</button>
+            <button class="filter-chip" type="button" data-filter="opinion" aria-pressed="false">Opinion</button>
+          </div>
+          <button class="theme-toggle" type="button" id="themeToggle" aria-pressed="false">
+            <span class="sr-only" id="themeToggleLabel">Switch to light mode</span>
+          </button>
         </div>
       </div>
 

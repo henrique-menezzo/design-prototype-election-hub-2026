@@ -14,13 +14,26 @@
 
   const toggle = document.getElementById("themeToggle");
   const themeLabel = document.getElementById("themeToggleLabel");
-  const themeIcon = document.getElementById("themeToggleIcon");
+
+  /* Sun and moon lifted from the election-hub-design prototype's ThemeToggle:
+     the icon shows the side you would switch TO, not the one you are on. */
+  const SUN = '<svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">' +
+    '<circle cx="8.5" cy="8.5" r="3.4" stroke="currentColor" stroke-width="1.5"/>' +
+    '<path d="M8.5 1.2v1.9M8.5 13.9v1.9M1.2 8.5h1.9M13.9 8.5h1.9M3.3 3.3l1.35 1.35' +
+    'M12.35 12.35l1.35 1.35M13.7 3.3l-1.35 1.35M4.65 12.35 3.3 13.7" ' +
+    'stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  const MOON = '<svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">' +
+    '<path d="M14.2 10.3A6.4 6.4 0 0 1 6.7 2.8a6.4 6.4 0 1 0 7.5 7.5Z" ' +
+    'stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 
   function syncToggle() {
     const isLight = root.getAttribute("data-theme") === "light";
-    if (themeLabel) themeLabel.textContent = isLight ? "Dark" : "Light";
-    if (themeIcon) themeIcon.textContent = isLight ? "◐" : "◑";
-    if (toggle) toggle.setAttribute("aria-pressed", String(isLight));
+    if (!toggle) return;
+    toggle.innerHTML = (isLight ? MOON : SUN) +
+      '<span class="sr-only" id="themeToggleLabel">' +
+      (isLight ? "Switch to dark mode" : "Switch to light mode") + "</span>";
+    toggle.setAttribute("aria-label", isLight ? "Switch to dark mode" : "Switch to light mode");
+    toggle.setAttribute("aria-pressed", String(isLight));
   }
   syncToggle();
 
