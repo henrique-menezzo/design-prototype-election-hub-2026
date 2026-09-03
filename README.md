@@ -246,11 +246,25 @@ Race can take a state off the ballot or put it back, and the panel follows.
 
 ## Feed filters
 
-The chips under "All Election Coverage" actually filter: each card carries a
-`data-kind` (episode, article, short, opinion) and the chips match against it.
-Cards leaving fade and collapse; the ones staying rise back in on a 55ms stagger,
-so the list reflows instead of snapping. A day heading left with nothing under it
-collapses with its cards.
+The collapsing pill bar from `election-hub-design`'s `CoverageFeed`:
+
+```
+browse     [All][Articles][Shorts][Episodes][Opinion]
+selected   [X][Articles][All Hosts v][All States v]
+```
+
+Picking a kind collapses the other pills — staggered outward from the one you
+chose, so the eye follows a wave instead of five things vanishing at once — the
+X grows in at the far left and the two secondary triggers slide out from behind
+the pill. Clicking the active pill exits, same as the X. The bar holds a fixed
+height throughout, so the feed below never shifts. Opinion gets no host trigger,
+as in the prototype.
+
+The filtering is real, not decoration: each card carries `data-kind`,
+`data-host` and `data-state-tag`, and the three filters compose. Cards leaving
+fade and collapse, the ones staying rise back on a 55ms stagger, a day heading
+left with nothing under it goes with its cards, and a combination that matches
+nothing says so.
 
 ## Motion
 

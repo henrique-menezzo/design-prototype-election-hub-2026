@@ -1363,3 +1363,153 @@ body.is-locked {
   .card[data-kind],
   .day-group { transition: none; }
 }
+
+
+/* ================================================================== *
+ * Collapsing filter bar (election-hub-design "Home_Page-Articles" motion)
+ * ================================================================== */
+
+.filter-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 52px;          /* fixed height: the feed below never shifts */
+  min-width: 0;
+}
+
+/* X — full 52px circle, collapsed to nothing while browsing */
+.filter-x {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-neutral-bold);
+  border-radius: var(--radius-full);
+  color: var(--color-icon-neutral-bold);
+  overflow: hidden;
+  min-width: 0;
+  padding: 0;
+  transition:
+    width var(--dur-medium) var(--ease),
+    opacity var(--dur-short) var(--ease),
+    transform var(--dur-medium) var(--ease),
+    margin var(--dur-medium) var(--ease),
+    border-color var(--dur-short) var(--ease);
+}
+.filter-x:hover { background: var(--color-background-neutral-subtle-hovered); }
+
+.filter-bar.is-browse .filter-x {
+  width: 0;
+  border-width: 0;
+  opacity: 0;
+  transform: scale(0.6);
+  margin-right: calc(var(--space-md) * -1);
+  border-color: transparent;
+  pointer-events: none;
+}
+
+/* the pills that were not picked collapse outward from the one that was */
+.filter-chip {
+  transition:
+    max-width var(--dur-medium) var(--ease),
+    opacity var(--dur-short) var(--ease),
+    padding var(--dur-medium) var(--ease),
+    margin var(--dur-medium) var(--ease),
+    background-color var(--dur-short) var(--ease),
+    border-color var(--dur-short) var(--ease);
+  transition-delay: var(--delay, 0ms);
+  max-width: 220px;
+  overflow: hidden;
+}
+
+.filter-bar.is-selected .filter-chip:not(.is-active) {
+  max-width: 0;
+  opacity: 0;
+  padding-inline: 0;
+  margin-inline: calc(var(--space-md) * -0.5);
+  border-color: transparent;
+  pointer-events: none;
+}
+
+.filter-chip.is-active {
+  background: var(--color-background-neutral-subtle-hovered);
+  border-color: transparent;
+}
+
+/* the triggers slide out from behind the pill */
+.filter-triggers {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: none;
+  transition:
+    opacity var(--dur-short) var(--ease),
+    transform var(--dur-medium) var(--ease),
+    max-width var(--dur-medium) var(--ease);
+  transition-delay: 90ms;
+  max-width: 420px;
+}
+
+.filter-bar.is-browse .filter-triggers {
+  opacity: 0;
+  transform: translateX(-40px);
+  max-width: 0;
+  pointer-events: none;
+  transition-delay: 0ms;
+}
+
+.filter-bar.no-host #hostTrigger { display: none; }
+
+.trigger-field { position: relative; }
+
+.host-trigger {
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0 var(--space-xl) 0 var(--space-md);
+  border: 1px solid var(--color-border-neutral-bold);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-neutral-bold);
+  white-space: nowrap;
+  transition: background-color var(--dur-short) var(--ease);
+}
+.host-trigger:hover { background: var(--color-background-neutral-subtle-hovered); }
+#stateTrigger { padding-left: var(--space-xl); }
+
+.host-avatar {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--color-background-neutral-subtlest);
+  color: var(--color-text-neutral-subtlest);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.trigger-field .chip-menu { top: calc(100% + var(--space-md)); left: 0; }
+
+.feed-empty {
+  padding: var(--space-4xl) 0;
+  font-size: var(--font-size-md);
+  color: var(--color-text-neutral-subtlest);
+}
+
+@media (max-width: 900px) {
+  .filter-bar { gap: var(--space-sm); min-height: 46px; }
+  .filter-x { width: 46px; height: 46px; }
+  .host-trigger { height: 46px; font-size: var(--font-size-sm); }
+  .host-avatar { width: 32px; height: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-x, .filter-chip, .filter-triggers { transition: none; }
+}
