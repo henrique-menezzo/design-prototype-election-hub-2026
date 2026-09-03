@@ -782,7 +782,9 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   .seatbar { height: 4px; }
   .seatbar__legend { font-size: var(--font-size-xs); }
 
-  .map-block { gap: var(--space-xl); padding-inline: var(--space-xl); }
+  /* The hero already pads 16 on each side; padding again here pushed the map
+     card and the DW+ band 16px further in than every other block. */
+  .map-block { gap: var(--space-xl); }
   .map-card {
     /* 361 × 410 in Figma */
     aspect-ratio: 361 / 410;
@@ -828,7 +830,6 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
     flex-direction: row;
     align-items: flex-start;
     gap: var(--space-xl);
-    margin: 0 var(--space-xl);
     padding: var(--space-xl) 18px var(--space-3xl);
   }
   .dwplus__left { gap: var(--space-xl); }
@@ -1375,12 +1376,16 @@ body.is-locked {
   opacity: 0;
   transform: translateY(-6px);
   max-height: 0;
-  margin-block: calc(var(--space-4xl) / -2);
   pointer-events: none;
   overflow: hidden;
 }
 
-.day-group.is-filtered-out { margin-block: calc(var(--space-9xl) / -2); }
+/* Once the collapse has played out the element leaves the flow for real. It
+   used to stay in place with a negative margin cancelling the flex gap, but a
+   collapsed FIRST group then ate the gap above it too and pulled the feed up
+   against the pills. */
+.card[data-kind].is-gone,
+.day-group.is-gone { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .card[data-kind],

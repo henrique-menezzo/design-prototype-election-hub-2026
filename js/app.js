@@ -110,6 +110,23 @@
     const HOSTS = uniq(feedCards.map(function (c) { return c.dataset.host; }));
     const STATES = uniq(feedCards.map(function (c) { return c.dataset.stateTag; }));
 
+    /* Hiding: play the collapse, then drop out of the flow so the element stops
+       contributing a flex gap. Showing: back into the flow first, then let the
+       expand animate from the collapsed state. */
+    function collapse(el, hide) {
+      if (hide) {
+        if (el.classList.contains("is-filtered-out")) return;
+        el.classList.add("is-filtered-out");
+        setTimeout(function () {
+          if (el.classList.contains("is-filtered-out")) el.classList.add("is-gone");
+        }, 420);
+      } else if (el.classList.contains("is-filtered-out")) {
+        el.classList.remove("is-gone");
+        void el.offsetHeight;
+        el.classList.remove("is-filtered-out");
+      }
+    }
+
     function applyFilter() {
       let shown = 0;
       feedCards.forEach(function (item) {
@@ -122,11 +139,11 @@
         } else {
           item.style.removeProperty("--delay");
         }
-        item.classList.toggle("is-filtered-out", !match);
+        collapse(item, !match);
       });
       document.querySelectorAll(".day-group").forEach(function (group) {
         const any = group.querySelector(".card[data-kind]:not(.is-filtered-out)");
-        group.classList.toggle("is-filtered-out", !any);
+        collapse(group, !any);
       });
 
       let empty = document.getElementById("feedEmpty");
