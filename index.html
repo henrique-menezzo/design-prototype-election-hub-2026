@@ -166,6 +166,22 @@
           <button class="filter-chip" type="button" data-filter="short" aria-pressed="false">Shorts</button>
           <button class="filter-chip" type="button" data-filter="episode" aria-pressed="false">Episodes</button>
           <button class="filter-chip" type="button" data-filter="opinion" aria-pressed="false">Opinion</button>
+
+          <div class="trigger-field" id="hostField">
+            <button class="host-trigger" type="button" id="hostTrigger" aria-haspopup="listbox" aria-expanded="false" tabindex="-1">
+              <span class="host-avatar" aria-hidden="true"></span>
+              <span id="hostLabel">All Hosts</span>
+              <svg width="12" height="6" viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="m1 1 5 4 5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <ul class="chip-menu" id="hostMenu" role="listbox" aria-label="Host" hidden></ul>
+          </div>
+          <div class="trigger-field" id="stateField">
+            <button class="host-trigger" type="button" id="stateTrigger" aria-haspopup="listbox" aria-expanded="false" tabindex="-1">
+              <span id="stateLabel">All States</span>
+              <svg width="12" height="6" viewBox="0 0 12 6" fill="none" aria-hidden="true"><path d="m1 1 5 4 5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <ul class="chip-menu" id="stateMenu" role="listbox" aria-label="State" hidden></ul>
+          </div>
         </div>
       </div>
 
@@ -175,7 +191,7 @@
           <h3 class="day-group__label">Today · Wednesday, August 19</h3>
           <div class="day-group__list">
 
-            <article class="card" data-kind="episode">
+            <article class="card" data-kind="episode" data-host="Ben Shapiro" data-state-tag="">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Ben Shapiro Reacts to Michelle Obama X Call Her Daddy Camps</h4>
@@ -197,7 +213,7 @@
               </div>
             </article>
 
-            <article class="card" data-kind="article">
+            <article class="card" data-kind="article" data-host="Jennie Taer" data-state-tag="PA">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Three Counties That Decide Pennsylvania</h4>
@@ -219,7 +235,7 @@
               </div>
             </article>
 
-            <article class="card" data-kind="article">
+            <article class="card" data-kind="article" data-host="Ben Shapiro" data-state-tag="">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Inside The 29: How The Closest House Races Were Chosen</h4>
@@ -241,7 +257,7 @@
               </div>
             </article>
 
-            <article class="card" data-kind="article">
+            <article class="card" data-kind="article" data-host="Jennie Taer" data-state-tag="ME">
               <div class="card__body">
                 <div class="card__text">
                   <span class="card__live">Live Updates</span>
@@ -270,7 +286,7 @@
         <section class="day-group">
           <h3 class="day-group__label">Yesterday · Tuesday, August 18</h3>
           <div class="day-group__list">
-            <article class="card" data-kind="short">
+            <article class="card" data-kind="short" data-host="Jennie Taer" data-state-tag="ME">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Maine Senate Race Tightens As Outside Money Pours Into Both Camps</h4>
@@ -298,7 +314,7 @@
         <section class="day-group">
           <div class="day-group__list">
 
-            <article class="card" data-kind="episode">
+            <article class="card" data-kind="episode" data-host="Ben Shapiro" data-state-tag="">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Ben Shapiro Reacts to Michelle Obama X Call Her Daddy Camps</h4>
@@ -320,7 +336,7 @@
               </div>
             </article>
 
-            <article class="card" data-kind="opinion">
+            <article class="card" data-kind="opinion" data-host="Ben Shapiro" data-state-tag="">
               <div class="card__body">
                 <div class="card__text">
                   <h4 class="card__title">Inside The 29: How The Closest House Races Were Chosen</h4>

@@ -74,36 +74,212 @@
   }
 
   /* =========================== FEED FILTER ===========================
-     The chips actually filter. Cards leaving fade and collapse, cards arriving
-     rise back in on a short stagger, so the list reflows instead of snapping. */
-  const filterChips = document.querySelectorAll(".filter-chip");
-  if (filterChips.length) {
-    const feedCards = document.querySelectorAll(".card[data-kind]");
+     Pill motion ported from election-hub-design (`.anim-pill-*` in its
+     index.css). Two rules from there that matter:
+
+       - the pills that leave FADE, they do not squeeze. Collapsing their width
+         reads as a bounce; opacity alone reads as them stepping back.
+       - their borders go first, otherwise a fading chip leaves a grey ring
+         hanging in the air.
+
+     The chosen pill then FLIPs into its new slot: the leavers go out of flow at
+     the position they already held, the chip's new left is measured, and it is
+     animated from the old offset to zero. Clicking the active pill returns,
+     which is also how the prototype exits. */
+  const filterChips = Array.prototype.slice.call(document.querySelectorAll(".filter-chip"));
+  const filterRow = document.querySelector(".filter-row");
+
+  if (filterChips.length && filterRow) {
+    const feedCards = Array.prototype.slice.call(document.querySelectorAll(".card[data-kind]"));
+    const hostField = document.getElementById("hostField");
+    const hostTrigger = document.getElementById("hostTrigger");
+    const hostMenu = document.getElementById("hostMenu");
+    const hostLabel = document.getElementById("hostLabel");
+    const stateTrigger = document.getElementById("stateTrigger");
+    const stateMenu = document.getElementById("stateMenu");
+    const stateLabel = document.getElementById("stateLabel");
+    const avatar = filterRow.querySelector(".host-avatar");
+
+    let kind = "all";
+    let host = null;
+    let stateScope = null;
+
+    const uniq = function (list) {
+      return list.filter(function (v, i) { return v && list.indexOf(v) === i; }).sort();
+    };
+    const HOSTS = uniq(feedCards.map(function (c) { return c.dataset.host; }));
+    const STATES = uniq(feedCards.map(function (c) { return c.dataset.stateTag; }));
+
+    function applyFilter() {
+      let shown = 0;
+      feedCards.forEach(function (item) {
+        const match = (kind === "all" || item.dataset.kind === kind) &&
+          (!host || item.dataset.host === host) &&
+          (!stateScope || item.dataset.stateTag === stateScope);
+        if (match) {
+          item.style.setProperty("--delay", shown * 55 + "ms");
+          shown++;
+        } else {
+          item.style.removeProperty("--delay");
+        }
+        item.classList.toggle("is-filtered-out", !match);
+      });
+      document.querySelectorAll(".day-group").forEach(function (group) {
+        const any = group.querySelector(".card[data-kind]:not(.is-filtered-out)");
+        group.classList.toggle("is-filtered-out", !any);
+      });
+
+      let empty = document.getElementById("feedEmpty");
+      const groups = document.querySelector(".coverage__groups");
+      if (!shown && !empty && groups) {
+        empty = document.createElement("p");
+        empty.id = "feedEmpty";
+        empty.className = "feed-empty";
+        empty.textContent = "Nothing here yet under these filters.";
+        groups.prepend(empty);
+      } else if (shown && empty) {
+        empty.remove();
+      }
+    }
+
+    function offsets() {
+      const base = filterRow.getBoundingClientRect().left;
+      return filterChips.map(function (c) { return c.getBoundingClientRect().left - base; });
+    }
+
+    function flip(active, before, after) {
+      const dx = before - after;
+      if (!dx) return;
+      active.style.transition = "none";
+      active.style.transform = "translateX(" + dx + "px)";
+      requestAnimationFrame(function () {
+        active.style.transition = "";
+        active.classList.add("is-flipping");
+        active.style.transform = "";
+        setTimeout(function () { active.classList.remove("is-flipping"); }, 340);
+      });
+    }
+
+    function setKind(next) {
+      const active = filterChips.filter(function (c) { return c.dataset.filter === next; })[0];
+      if (!active) return;
+      const before = offsets();
+
+      kind = next;
+      filterChips.forEach(function (c, i) {
+        const on = c === active;
+        c.classList.toggle("is-active", on && next !== "all");
+        c.setAttribute("aria-pressed", String(on));
+        /* leavers hold the slot they already had while they fade */
+        if (next !== "all" && !on) {
+          c.style.setProperty("--x", before[i] + "px");
+          c.classList.add("is-fading");
+        } else {
+          c.classList.remove("is-fading");
+          c.style.removeProperty("--x");
+        }
+      });
+
+      /* The two secondary pills slide out from behind the chosen one. Opinion
+         gets no host trigger, as in the prototype. */
+      const selecting = next !== "all";
+      filterRow.classList.toggle("is-selected", selecting);
+      if (hostField) hostField.hidden = next === "opinion";
+      [hostTrigger, stateTrigger].forEach(function (el) {
+        if (el) el.tabIndex = selecting ? 0 : -1;
+      });
+      if (!selecting) {
+        host = null;
+        stateScope = null;
+        if (hostLabel) hostLabel.textContent = "All Hosts";
+        if (stateLabel) stateLabel.textContent = "All States";
+        if (avatar) avatar.textContent = "";
+        closeFeedMenus();
+      }
+
+      flip(active, before[filterChips.indexOf(active)], offsets()[filterChips.indexOf(active)]);
+      applyFilter();
+    }
+
+    /* ---- the two secondary pills ---- */
+    function closeFeedMenus() {
+      [[hostTrigger, hostMenu], [stateTrigger, stateMenu]].forEach(function (pair) {
+        if (!pair[0] || pair[1].hidden) return;
+        pair[1].classList.remove("is-open");
+        pair[0].setAttribute("aria-expanded", "false");
+        const menu = pair[1];
+        setTimeout(function () {
+          if (!menu.classList.contains("is-open")) menu.hidden = true;
+        }, 280);
+      });
+    }
+
+    function buildMenu(menu, items, current, onPick) {
+      menu.innerHTML = items.map(function (it) {
+        return '<li><button type="button" role="option" data-id="' + it.id + '"' +
+          ((it.id || null) === current ? ' aria-selected="true"' : ' aria-selected="false"') +
+          ">" + it.label + "</button></li>";
+      }).join("");
+      menu.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          onPick(b.dataset.id || null);
+          closeFeedMenus();
+        });
+      });
+    }
+
+    function openMenu(trigger, menu) {
+      const willOpen = !menu.classList.contains("is-open");
+      closeFeedMenus();
+      if (!willOpen) return;
+      menu.hidden = false;
+      requestAnimationFrame(function () { menu.classList.add("is-open"); });
+      trigger.setAttribute("aria-expanded", "true");
+    }
+
+    if (hostTrigger) {
+      hostTrigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        buildMenu(hostMenu,
+          [{ id: "", label: "All Hosts" }].concat(HOSTS.map(function (h) { return { id: h, label: h }; })),
+          host,
+          function (id) {
+            host = id;
+            hostLabel.textContent = id || "All Hosts";
+            if (avatar) {
+              avatar.textContent = id
+                ? id.split(" ").map(function (w) { return w[0]; }).slice(0, 2).join("")
+                : "";
+            }
+            applyFilter();
+          });
+        openMenu(hostTrigger, hostMenu);
+      });
+    }
+
+    if (stateTrigger) {
+      stateTrigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        buildMenu(stateMenu,
+          [{ id: "", label: "All States" }].concat(STATES.map(function (s) {
+            return { id: s, label: window.EH.names[s] || s };
+          })),
+          stateScope,
+          function (id) {
+            stateScope = id;
+            stateLabel.textContent = id ? (window.EH.names[id] || id) : "All States";
+            applyFilter();
+          });
+        openMenu(stateTrigger, stateMenu);
+      });
+    }
+
+    document.addEventListener("click", closeFeedMenus);
 
     filterChips.forEach(function (chip) {
       chip.addEventListener("click", function () {
-        const want = chip.dataset.filter;
-        filterChips.forEach(function (c) {
-          c.setAttribute("aria-pressed", String(c === chip));
-        });
-
-        let shown = 0;
-        feedCards.forEach(function (item) {
-          const match = want === "all" || item.dataset.kind === want;
-          if (match) {
-            item.style.setProperty("--delay", shown * 55 + "ms");
-            shown++;
-          } else {
-            item.style.removeProperty("--delay");
-          }
-          item.classList.toggle("is-filtered-out", !match);
-        });
-
-        /* a day heading with nothing left under it goes too */
-        document.querySelectorAll(".day-group").forEach(function (group) {
-          const any = group.querySelector(".card[data-kind]:not(.is-filtered-out)");
-          group.classList.toggle("is-filtered-out", !any);
-        });
+        /* clicking the pill that is already on returns to browsing */
+        setKind(chip.classList.contains("is-active") ? "all" : chip.dataset.filter);
       });
     });
   }

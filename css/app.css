@@ -1363,3 +1363,108 @@ body.is-locked {
   .card[data-kind],
   .day-group { transition: none; }
 }
+
+
+/* ---- pill motion, ported from election-hub-design (.anim-pill-*) ---- */
+
+.filter-row { position: relative; }
+
+/* Leavers fade in place. No width squeeze — that read as a bounce — and the
+   border goes first, so a fading chip never leaves a grey ring behind. */
+.filter-chip.is-fading {
+  position: absolute;
+  top: 0;
+  left: var(--x, 0);
+  opacity: 0;
+  border-color: transparent;
+  pointer-events: none;
+  transition: opacity 240ms ease, border-color 160ms ease;
+}
+
+/* The chosen pill rides into its new slot. */
+.filter-chip.is-flipping {
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-chip.is-fading,
+  .filter-chip.is-flipping { transition: none; }
+}
+
+
+/* ---- the two secondary pills, revealed once a kind is picked ---- */
+
+.trigger-field {
+  position: relative;
+  flex: none;
+  /* they sit behind the chosen pill and slide out from under it */
+  z-index: 1;
+  transition:
+    opacity 240ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 90ms;
+  max-width: 320px;
+}
+
+.filter-row:not(.is-selected) .trigger-field {
+  opacity: 0;
+  transform: translateX(-56px);
+  max-width: 0;
+  margin-left: calc(var(--space-md) * -1);
+  pointer-events: none;
+  transition-delay: 0ms;
+}
+
+.host-trigger {
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0 var(--space-xl) 0 var(--space-md);
+  border: 1px solid var(--color-border-neutral-bold);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-neutral-bold);
+  white-space: nowrap;
+  transition: background-color var(--dur-short) var(--ease);
+}
+.host-trigger:hover { background: var(--color-background-neutral-subtle-hovered); }
+#stateTrigger { padding-left: var(--space-xl); }
+
+.host-avatar {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--color-background-neutral-subtlest);
+  color: var(--color-text-neutral-subtlest);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.trigger-field .chip-menu { top: calc(100% + var(--space-md)); left: 0; }
+
+.feed-empty {
+  padding: var(--space-4xl) 0;
+  font-size: var(--font-size-md);
+  color: var(--color-text-neutral-subtlest);
+}
+
+/* the chosen pill rides above the emerging triggers */
+.filter-chip.is-active { position: relative; z-index: 2; }
+
+@media (max-width: 900px) {
+  .host-trigger { height: 46px; }
+  .host-avatar { width: 32px; height: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger-field { transition: none; }
+}
