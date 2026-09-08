@@ -63,17 +63,20 @@
      is where this map's look comes from. Deliberately NOT the brand red: brand
      never encodes data, party colours never style chrome. Identical in both
      themes — saturation carries meaning, so it cannot shift with the theme. */
-  --rating-safe-d: #1041b7;
-  --rating-likely-d: #0065f4;
-  --rating-lean-d: #86c7ff;
-  --rating-tossup: #9ca3b0;
-  --rating-lean-r: #ffa0a3;
-  --rating-likely-r: #ee2532;
-  --rating-safe-r: #a8000f;
+  /* Ramp lifted from the "Senate Hemicycle / 100 seats" frame (8587:177970):
+     nine seat colours running cyan -> blue -> navy -> dark -> maroon -> red.
+     The bright ends are the comfortable races and the dark middle is the close
+     ones, so brightness reads as distance between the parties. Seven of the
+     nine map onto our categories; #001b7e and #99003b are the two the seven
+     categories have no slot for. */
+  --rating-safe-d: #01cefb;
+  --rating-likely-d: #0f45db;
+  --rating-lean-d: #0017a3;
+  --rating-tossup: #33003b;
+  --rating-lean-r: #65003a;
+  --rating-likely-r: #cc003b;
+  --rating-safe-r: #fb1616;
 
-  /* Three different kinds of "no colour", kept distinct:
-     nodata = the race exists, this source published nothing
-     off    = no race here in this chamber — inert, barely above the surface */
   --rating-nodata: #545454;
   --rating-blank: #1f1f1f;
 
@@ -86,6 +89,19 @@
   --dur-short: 260ms;   /* hover, chips, buttons */
   --dur-medium: 420ms;  /* panel entering, staggered content */
   --dur-long: 620ms;    /* map camera, bars growing */
+
+  /* Abbreviation colour per rating — black or white, whichever contrasts more
+     over that fill. Computed by scripts/gen_map.py, which prints this block.
+     Worst case is 5.0:1 (Safe R), above the AA minimum. */
+  --label-safe-d: #0a0909;    /* 10.6:1 over #01cefb */
+  --label-likely-d: #fafafa;  /*  7.0:1 over #0f45db */
+  --label-lean-d: #fafafa;    /* 12.2:1 over #0017a3 */
+  --label-tossup: #fafafa;    /* 16.7:1 over #33003b */
+  --label-lean-r: #fafafa;    /* 12.5:1 over #65003a */
+  --label-likely-r: #fafafa;  /*  5.5:1 over #cc003b */
+  --label-safe-r: #0a0909;    /*  5.0:1 over #fb1616 */
+  --label-nodata: #0a0909;    /*  6.1:1 over #8f8f8f */
+  --label-blank: #fafafa;     /* 17.5:1 over #151515 */
 
   /* ---- Seat bar ---- */
   --seatbar-track: #212121;

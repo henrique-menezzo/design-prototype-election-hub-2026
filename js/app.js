@@ -47,28 +47,34 @@
   }
 
   /* =========================== COUNTDOWN ============================
-     The frame reads "3d 5h 20m" — that is how far the election is when the page
-     opens, and from there the clock actually runs, with the seconds on show so
-     you can watch time move. */
-  const countdownEl = document.getElementById("countdown");
-  if (countdownEl) {
-    const target = Date.now() + ((3 * 24 + 5) * 60 + 20) * 60 * 1000;
+     Counts to the real deadline — polls close 8pm ET on Election Day,
+     3 November 2026 — so the four cells tick on their own and stay honest
+     whatever day the page is opened. The seconds are on show, so the clock
+     is re-aligned to the wall-clock second on every tick rather than
+     drifting on a plain 1000ms interval. */
+  const ELECTION_CLOSE = Date.parse("2026-11-03T20:00:00-05:00");
+  const cd = {
+    d: document.getElementById("cdD"),
+    h: document.getElementById("cdH"),
+    m: document.getElementById("cdM"),
+    s: document.getElementById("cdS")
+  };
+  if (cd.d && cd.h && cd.m && cd.s) {
+    const pad = function (n) { return n < 10 ? "0" + n : String(n); };
+
+    function paint(el, value) {
+      if (el.textContent !== value) el.textContent = value;
+    }
 
     function tick() {
-      let left = Math.max(0, target - Date.now());
-      if (left === 0) { countdownEl.textContent = "moments"; return; }
-      const s = Math.floor(left / 1000);
-      const d = Math.floor(s / 86400);
-      const h = Math.floor((s % 86400) / 3600);
-      const m = Math.floor((s % 3600) / 60);
-      const sec = s % 60;
-      countdownEl.textContent =
-        (d ? d + "d " : "") +
-        (d || h ? h + "h " : "") +
-        m + "m " + sec + "s";
-      requestAnimationFrame(function () {
-        setTimeout(tick, 1000 - (Date.now() % 1000));
-      });
+      const left = Math.max(0, ELECTION_CLOSE - Date.now());
+      const total = Math.floor(left / 1000);
+      paint(cd.d, pad(Math.floor(total / 86400)));
+      paint(cd.h, pad(Math.floor((total % 86400) / 3600)));
+      paint(cd.m, pad(Math.floor((total % 3600) / 60)));
+      paint(cd.s, pad(total % 60));
+      if (left === 0) return;
+      setTimeout(tick, 1000 - (Date.now() % 1000));
     }
     tick();
   }
@@ -144,6 +150,11 @@
       document.querySelectorAll(".day-group").forEach(function (group) {
         const any = group.querySelector(".card[data-kind]:not(.is-filtered-out)");
         collapse(group, !any);
+        /* the topmost visible card of each day drops its divider, whatever
+           is hidden above it */
+        group.querySelectorAll(".card[data-kind]").forEach(function (c) {
+          c.classList.toggle("is-feed-first", c === any);
+        });
       });
 
       let empty = document.getElementById("feedEmpty");
@@ -574,24 +585,13 @@
      something else */
   const WIDTH_BASE = { dem: 48.70, toss: 1.37, rep: 49.93 };
 
-  const seatEls = {
-    dem: document.getElementById("seatDem"),
-    toss: document.getElementById("seatToss"),
-    rep: document.getElementById("seatRep"),
-    segDem: document.getElementById("segDem"),
-    segToss: document.getElementById("segToss"),
-    segRep: document.getElementById("segRep"),
-    bar: document.getElementById("seatbar")
-  };
-
-  /* The frame writes "1.000" — a pt/eu thousands separator. On an English page
-     for a US reader that reads as one, so the separator here is a comma. */
-  function fmt(n) {
-    return n.toLocaleString("en-US");
-  }
+  /* The seat bar is gone from the screen — the dot grid already says who is
+     ahead and by how much, and two devices repeating it was noise. The split
+     it used to draw is still computed here, because the grid is dealt from it. */
+  const SEAT_SPLIT_SOURCE = true;
 
   function updateSeatbar() {
-    if (!svg || !seatEls.bar) return;
+    if (!svg) return;
     const count = { dem: 0, toss: 0, rep: 0 };
     svg.querySelectorAll(".state").forEach(function (g) {
       const r = g.getAttribute("class").match(/r-([a-z-]+)/)[1];
@@ -601,27 +601,70 @@
       else count.rep++;
     });
 
+    const chamber = CHAMBER_SEATS[race] || CHAMBER_SEATS.house;
+    const cSum = count.dem + count.toss + count.rep || 1;
     const seats = {
-      dem: Math.round(SEAT_BASE.dem * count.dem / COUNT_BASE.dem),
-      toss: Math.round(SEAT_BASE.toss * count.toss / COUNT_BASE.toss),
-      rep: Math.round(SEAT_BASE.rep * count.rep / COUNT_BASE.rep)
+      dem: Math.round(chamber * count.dem / cSum),
+      toss: Math.round(chamber * count.toss / cSum),
+      rep: 0
     };
-    const w = {
-      dem: WIDTH_BASE.dem * seats.dem / SEAT_BASE.dem,
-      toss: WIDTH_BASE.toss * seats.toss / SEAT_BASE.toss,
-      rep: WIDTH_BASE.rep * seats.rep / SEAT_BASE.rep
-    };
-    const wTotal = w.dem + w.toss + w.rep || 1;
+    seats.rep = chamber - seats.dem - seats.toss;
 
-    seatEls.dem.textContent = fmt(seats.dem);
-    seatEls.toss.textContent = fmt(seats.toss);
-    seatEls.rep.textContent = fmt(seats.rep);
-    seatEls.segDem.style.width = (w.dem / wTotal * 100).toFixed(2) + "%";
-    seatEls.segToss.style.width = (w.toss / wTotal * 100).toFixed(2) + "%";
-    seatEls.segRep.style.width = (w.rep / wTotal * 100).toFixed(2) + "%";
-    seatEls.bar.setAttribute("aria-label",
-      "Assentos: Democratas " + fmt(seats.dem) + ", indefinidos " + fmt(seats.toss) +
-      ", Republicanos " + fmt(seats.rep));
+    renderSeats(seats);
+  }
+
+  /* ---------------------------- seats grid ----------------------------
+     The frame draws 15 rows of 54 21px dots — 810 slots — under the name
+     "Grid 436". The geometry here is the frame's (54 to a row, 3.48 gap); the
+     COUNT follows the brief instead: 435 for the House, 100 for the Senate.
+     Flagged rather than silently split the difference. */
+  const CHAMBER_SEATS = { house: 435, senate: 100, governor: 36 };
+  const SEATS_PER_ROW = 54;
+
+  const seatsGrid = document.getElementById("seatsGrid");
+  const marginBig = document.getElementById("marginBig");
+  const pickPct = document.getElementById("pickPct");
+  const pickSourceLabel = document.getElementById("pickSourceLabel");
+  const pickRaceLabel = document.getElementById("pickRaceLabel");
+
+  /* The ramp as the frame uses it in the grid: five steps a side. */
+  const GRID_D = ["#01cefb", "#0f45db", "#0017a3", "#001b7e", "#17075d"];
+  const GRID_R = ["#33003b", "#65003a", "#99003b", "#cc003b", "#fc002c"];
+
+  function dealt(n, ramp, reverse) {
+    let out = "";
+    for (let i = 0; i < n; i++) {
+      const step = Math.min(ramp.length - 1, Math.floor(i * ramp.length / Math.max(1, n)));
+      out += '<i style="background:' + ramp[reverse ? ramp.length - 1 - step : step] + '"></i>';
+    }
+    return out;
+  }
+
+  function renderSeats(seats) {
+    if (!seatsGrid) return;
+    const total = CHAMBER_SEATS[race] || CHAMBER_SEATS.house;
+    const cols = Math.min(SEATS_PER_ROW, total);
+    seatsGrid.style.setProperty("--cols", cols);
+
+    const sum = seats.dem + seats.toss + seats.rep || 1;
+    const nDem = Math.round(total * seats.dem / sum);
+    const nToss = Math.round(total * seats.toss / sum);
+    const nRep = total - nDem - nToss;
+
+    /* Democrats run out from the cyan end, Republicans in to the red end, so
+       the row reads as one spectrum with the close races meeting in the dark. */
+    seatsGrid.innerHTML =
+      dealt(nDem, GRID_D, false) +
+      dealt(nToss, ["#17075d", "#33003b"], false) +
+      dealt(nRep, GRID_R, false);
+
+    if (pickRaceLabel) pickRaceLabel.textContent = label(window.EH.races, race);
+    if (pickSourceLabel) pickSourceLabel.textContent = label(window.EH.sources, source);
+    if (pickPct) pickPct.textContent = Math.round(seats.dem / sum * 100) + "%";
+    if (marginBig) {
+      const lead = seats.rep >= seats.dem ? "R" : "D";
+      marginBig.textContent = lead + Math.abs(seats.rep - seats.dem);
+    }
   }
 
   /* Repaints the whole map for the current race/source. */

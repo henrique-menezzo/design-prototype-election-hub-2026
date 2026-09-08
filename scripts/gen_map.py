@@ -48,13 +48,13 @@ DESKTOP_LABEL = (11.0, 34.0, 22.0)   # size, min box width, min box height
 MOBILE_LABEL = (7.0, 24.0, 15.0)
 
 FILL_BY_THEME = {
-    "safe-d": ("#1d4ed8", "#1d4ed8"),
-    "likely-d": ("#2563eb", "#2563eb"),
-    "lean-d": ("#93c5fd", "#93c5fd"),
-    "tossup": ("#ecddb7", "#ecddb7"),
-    "lean-r": ("#f7b0af", "#f7b0af"),
-    "likely-r": ("#ef4444", "#ef4444"),
-    "safe-r": ("#991b1b", "#991b1b"),
+    "safe-d": ("#01cefb", "#01cefb"),
+    "likely-d": ("#0f45db", "#0f45db"),
+    "lean-d": ("#0017a3", "#0017a3"),
+    "tossup": ("#33003b", "#33003b"),
+    "lean-r": ("#65003a", "#65003a"),
+    "likely-r": ("#cc003b", "#cc003b"),
+    "safe-r": ("#fb1616", "#fb1616"),
     "nodata": ("#8f8f8f", "#8f8f8f"),
     "off": ("#292929", "#dfdfdf"),      # dark, light
     "blank": ("#151515", "#151515"),
@@ -206,7 +206,8 @@ def build(shapes, ratings, anchors, out, viewbox, box, label):
         code = s["id"]
         cls = ratings.get(code, "off")
         bx, by, bw, bh, ax, ay, radius = anchors[code]
-        boxes[code] = [round(bx * k, 2), round(by * k, 2), round(bw * k, 2), round(bh * k, 2)]
+        boxes[code] = [round(bx * k, 2), round(by * k, 2), round(bw * k, 2), round(bh * k, 2),
+                       round(ax * k, 2), round(ay * k, 2), round(radius * k, 2)]
 
         text = ""
         # No label where the shape, at the size it is actually drawn, cannot

@@ -18,11 +18,10 @@
 
     <nav class="desktop-only" aria-label="Primary">
       <ul class="nav-list">
-        <li><a class="nav-item" href="#" aria-current="page">News</a></li>
+        <li><a class="nav-item" href="#">News</a></li>
         <li><a class="nav-item" href="#">Shows &amp; Movies</a></li>
         <li><a class="nav-item" href="#">All Access</a></li>
-        <li><a class="nav-item" href="#">Shop</a></li>
-        <li><a class="nav-item" href="#">Kids</a></li>
+        <li><a class="nav-item is-current" href="#" aria-current="page">The Midterms</a></li>
         <li><a class="nav-item" href="#"><span class="icon icon--sm" style="color:var(--color-icon-brand-bold);-webkit-mask-image:url(assets/icons/icon_tabler-icon-brand-youtube.svg);mask-image:url(assets/icons/icon_tabler-icon-brand-youtube.svg)"></span>DWTV</a></li>
       </ul>
     </nav>
@@ -58,54 +57,59 @@
   <!-- ================================ HERO ================================ -->
   <section class="hero shell">
 
-    <div class="hero__head">
-      <p class="hero__countdown">Elections will start in <span id="countdown">3d 5h 20m</span></p>
-      <h1 class="hero__title">2026 Midterms Elections<br class="hero__break">and Predictions.</h1>
-      <p class="hero__updated">Last updated September 1, 2026 · 1:00PM</p>
+    <!-- Map Final 8633:1053380 — title row, countdown, statement, seats grid -->
+    <div class="hero__title-row">
+      <div class="hero__titles">
+        <h1 class="hero__title">The Midterms</h1>
+        <p class="hero__presented">Presented by
+          <img src="assets/img/presented-by.png" alt="Polymarket" width="100" height="18">
+        </p>
+      </div>
+      <img class="hero__mark" src="assets/dot-mark.svg" alt="" width="130" height="111">
     </div>
+
+    <hr class="hero__rule">
+
+    <div class="countdown" role="group" aria-label="Time until polls close">
+      <div class="countdown__cell"><u id="cdD">55</u><span>days</span></div>
+      <div class="countdown__cell"><u id="cdH">05</u><span>hours</span></div>
+      <div class="countdown__cell"><u id="cdM">20</u><span>minutes</span></div>
+      <div class="countdown__cell"><u id="cdS">50</u><span>seconds</span></div>
+    </div>
+
+    <div class="statement">
+      <!-- div, not p: the pickers carry <ul> menus, which the parser would use to
+           auto-close a <p> — that silently dropped the rest of the sentence out of
+           the 48px block. -->
+      <div class="statement__text">
+        <span class="statement__field">
+          <button class="statement__pick" type="button" id="sourceChip" aria-haspopup="listbox" aria-expanded="false">
+            <span id="pickSourceLabel">Polymarket</span>
+            <span class="icon icon--lg" aria-hidden="true" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg);mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg)"></span>
+          </button>
+          <ul class="chip-menu" id="sourceMenu" role="listbox" aria-label="Source" hidden></ul>
+        </span><br>
+        predicts <span id="pickPct">53%</span> chance<br>
+        Democrats take the
+        <span class="statement__field">
+          <button class="statement__pick" type="button" id="raceChip" aria-haspopup="listbox" aria-expanded="false">
+            <span id="pickRaceLabel">Senate</span>
+            <span class="icon icon--lg" aria-hidden="true" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg);mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg)"></span>
+          </button>
+          <ul class="chip-menu" id="raceMenu" role="listbox" aria-label="Race" hidden></ul>
+        </span>
+      </div>
+      <p class="statement__margin" id="marginBig">R54</p>
+    </div>
+
+    <div class="seatsgrid" id="seatsGrid" role="img" aria-label="Seats in play"></div>
 
     <!-- seat bar + numbers -->
-    <div class="seatbar-block">
-      <div class="seatbar" id="seatbar" role="img" aria-label="Seats: Democrats 470, toss-ups 60, Republicans 1,000">
-        <span class="seatbar__seg seatbar__seg--dem" id="segDem" style="width:48.70%"></span>
-        <span class="seatbar__seg seatbar__seg--toss" id="segToss" style="width:1.37%"></span>
-        <span class="seatbar__seg seatbar__seg--rep" id="segRep" style="width:49.93%"></span>
-      </div>
-      <div class="seatbar__legend">
-        <span>Democrats:&nbsp;<b class="is-dem" id="seatDem">470</b></span>
-        <span>Toss-ups:&nbsp;<b id="seatToss">60</b></span>
-        <span>Republicans:&nbsp;<b class="is-rep" id="seatRep">1,000</b></span>
-      </div>
-    </div>
-
     <!-- map -->
     <div class="map-block">
       <div class="map-card">
 
         <div class="map-card__map" id="mapSlot"></div>
-
-        <div class="map-chips">
-          <div class="chip-field">
-            <button class="chip" type="button" id="raceChip" aria-haspopup="listbox" aria-expanded="false">
-              <span class="chip__stack">
-                <span class="chip__label">Race</span>
-                <span class="chip__value" id="raceValue">House</span>
-              </span>
-              <span class="icon icon--lg" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg);mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg)"></span>
-            </button>
-            <ul class="chip-menu" id="raceMenu" role="listbox" aria-label="Race" hidden></ul>
-          </div>
-          <div class="chip-field">
-            <button class="chip" type="button" id="sourceChip" aria-haspopup="listbox" aria-expanded="false">
-              <span class="chip__stack">
-                <span class="chip__label">Source</span>
-                <span class="chip__value" id="sourceValue">Polymarket</span>
-              </span>
-              <span class="icon icon--lg" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg);mask-image:url(assets/icons/icon_tabler-icon-chevron-down.svg)"></span>
-            </button>
-            <ul class="chip-menu" id="sourceMenu" role="listbox" aria-label="Source" hidden></ul>
-          </div>
-        </div>
 
         <div class="map-zoom">
           <button class="map-zoom__btn" type="button" id="zoomIn" aria-label="Zoom in">
@@ -196,173 +200,233 @@
           <h3 class="day-group__label">Today · Wednesday, August 19</h3>
           <div class="day-group__list">
 
-            <article class="card" data-kind="episode" data-host="Ben Shapiro" data-state-tag="">
-              <div class="card__body">
-                <div class="card__text">
-                  <h4 class="card__title">Ben Shapiro Reacts to Michelle Obama X Call Her Daddy Camps</h4>
-                </div>
-                <div class="card__thumb card__thumb--episode">
-                  <img src="assets/img/img4_Episode-thumb.png" alt="" width="208" height="114">
-                  <span class="card__badge">1h 20m</span>
-                </div>
-              </div>
-              <div class="card__meta">
-                <div class="meta-list">
-                  <span class="is-date">1 day ago</span><span>•</span>
-                  <span>Ep. 50</span><span>•</span>
-                  <span>The Ben Shapiro Show</span>
-                </div>
-                <button class="icon-btn" type="button" aria-label="More options">
-                  <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span>
-                </button>
-              </div>
-            </article>
+      <article class="card" data-kind="short" data-host="Jennie Taer" data-state-tag="">
+        <img class="card__avatar" src="assets/img/feed-av-1.png" alt="" width="48" height="48">
+        <div class="card__main">
+        <div class="card__meta">
+          <div class="meta-list">
+            <span class="byline">Jennie Taer</span><span>•</span>
+            <span>Short</span><span>•</span>
+            <span>3 min ago</span>
+          </div>
+          <button class="icon-btn" type="button" aria-label="More options"><span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span></button>
+        </div>
+          <div class="card__text">
+            <h4 class="card__title">The One Line In Iran’s Proposal That Made Trump ‘Throw It Away’</h4>
+          </div>
+          <figure class="card__media card__media--short">
+            <img src="assets/img/feed-short-iran.png" alt="" width="330" height="587">
+            <button class="card__mute" type="button" aria-label="Unmute"><span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-volume-3.svg);mask-image:url(assets/icons/icon_tabler-icon-volume-3.svg)"></span></button>
+          </figure>
+        </div>
+      </article>
 
-            <article class="card" data-kind="article" data-host="Jennie Taer" data-state-tag="PA">
-              <div class="card__body">
-                <div class="card__text">
-                  <h4 class="card__title">Three Counties That Decide Pennsylvania</h4>
-                  <p class="card__desc">The FBI recently warned California authorities that Iran was potentially plotting “a surprise attack using unmanned aerial vehicles” targeting the West Coast in retaliation for a U.S. strike on the Iranian regime.</p>
-                </div>
-                <div class="card__thumb">
-                  <img src="assets/img/img7_Thumbnail.png" alt="" width="203" height="114">
-                </div>
-              </div>
-              <div class="card__meta">
-                <div class="meta-list">
-                  <span class="is-date">1 day ago</span><span>•</span>
-                  <span>5 min</span><span>•</span>
-                  <span>Jennie Taer</span>
-                </div>
-                <button class="icon-btn" type="button" aria-label="More options">
-                  <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span>
-                </button>
-              </div>
-            </article>
+      <article class="card" data-kind="article" data-host="Jennie Taer" data-state-tag="PA">
+        <span class="card__avatar card__avatar--initials" aria-hidden="true">JT</span>
+        <div class="card__main">
+        <div class="card__meta">
+          <div class="meta-list">
+            <span class="byline">Jennie Taer</span><span>•</span>
+            <span>Article</span><span>•</span>
+            <span>3 min ago</span>
+          </div>
+          <button class="icon-btn" type="button" aria-label="More options"><span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span></button>
+        </div>
+          <div class="card__text">
+            <h4 class="card__title">Three Counties That Decide Pennsylvania</h4>
+          <p class="card__desc">The FBI recently warned California authorities that Iran was potentially plotting “a surprise attack using unmanned aerial vehicles” targeting the West Coast in retaliation for a U.S. strike on the Iranian regime.</p>
+          </div>
+          <figure class="card__media">
+            <img src="assets/img/feed-thumb-pa.png" alt="" width="548" height="308">
+          </figure>
+        </div>
+      </article>
 
-            <article class="card" data-kind="article" data-host="Ben Shapiro" data-state-tag="">
-              <div class="card__body">
-                <div class="card__text">
-                  <h4 class="card__title">Inside The 29: How The Closest House Races Were Chosen</h4>
-                  <p class="card__desc">The methodology behind the curated district list — and what it leaves out on purpose.</p>
-                </div>
-                <div class="card__thumb">
-                  <img src="assets/img/img10_Thumbnail.png" alt="" width="203" height="114">
-                </div>
-              </div>
-              <div class="card__meta">
-                <div class="meta-list">
-                  <span class="is-date">1 day ago</span><span>•</span>
-                  <span>5 min</span><span>•</span>
-                  <span class="byline"><img src="assets/img/img11_Host-Image.png" alt="" width="24" height="24">Ben Shapiro</span>
-                </div>
-                <button class="icon-btn" type="button" aria-label="More options">
-                  <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span>
-                </button>
-              </div>
-            </article>
+      <article class="card card--promo" data-kind="promo" data-host="" data-state-tag="">
+        <img class="card__avatar" src="assets/img/feed-av-dw.png" alt="" width="48" height="48">
+        <div class="card__main">
+          <div class="card__text">
+            <h4 class="card__title">3 months of the Annual plan for just $17.99</h4>
+            <p class="card__desc">Promotion valid until September 17, 2026</p>
+          </div>
+          <figure class="card__media card__media--offer">
+            <span class="card__flag">NEW</span>
+            <img src="assets/img/feed-promo-offer.png" alt="" width="546" height="546">
+            <figcaption class="offer-bar">
+              <span class="offer-bar__text"><b>Annual Plan for 3 months</b><span>$17.99</span></span>
+              <a class="btn btn--light" href="#">BECOME A MEMBER</a>
+            </figcaption>
+          </figure>
+        </div>
+      </article>
 
-            <article class="card" data-kind="article" data-host="Jennie Taer" data-state-tag="ME">
-              <div class="card__body">
-                <div class="card__text">
-                  <span class="card__live">Live Updates</span>
-                  <h4 class="card__title">Maine Senate Race Tightens As Outside Money Pours Into Both Camps</h4>
-                  <p class="card__desc">The FBI recently warned California authorities that Iran was potentially plotting “a surprise attack using unmanned aerial vehicles” targeting the West Coast.</p>
-                </div>
-                <div class="card__thumb">
-                  <img src="assets/img/img13_Thumbnail.png" alt="" width="203" height="114">
-                </div>
-              </div>
-              <div class="card__meta">
-                <div class="meta-list">
-                  <span class="is-date">1 day ago</span><span>•</span>
-                  <span>5 min</span><span>•</span>
-                  <span>Jennie Taer</span>
-                </div>
-                <button class="icon-btn" type="button" aria-label="More options">
-                  <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span>
-                </button>
-              </div>
-            </article>
-
+      <article class="card" data-kind="opinion" data-host="Ben Shapiro" data-state-tag="">
+        <img class="card__avatar" src="assets/img/feed-av-2.png" alt="" width="48" height="48">
+        <div class="card__main">
+        <div class="card__meta">
+          <div class="meta-list">
+            <span class="byline">Ben Shapiro</span><span>•</span>
+            <span>Opinion</span><span>•</span>
+            <span>3 min ago</span>
+          </div>
+          <button class="icon-btn" type="button" aria-label="More options"><span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span></button>
+        </div>
+          <div class="card__text">
+            <h4 class="card__title">Inside The 29: How The Closest House Races Were Chosen</h4>
+          <p class="card__desc">The methodology behind the curated district list — and what it leaves out on purpose.</p>
+          </div>
+          <figure class="card__media">
+            <img src="assets/img/feed-thumb-29.png" alt="" width="548" height="308">
+          </figure>
+        </div>
+      </article>
           </div>
         </section>
 
         <section class="day-group">
           <h3 class="day-group__label">Yesterday · Tuesday, August 18</h3>
           <div class="day-group__list">
-            <article class="card" data-kind="short" data-host="Jennie Taer" data-state-tag="ME">
-              <div class="card__body">
-                <div class="card__text">
-                  <h4 class="card__title">Maine Senate Race Tightens As Outside Money Pours Into Both Camps</h4>
-                </div>
-                <div class="card__thumb card__thumb--short">
-                  <img src="assets/img/img16_Shorts-Card.png" alt="" width="131" height="231">
-                </div>
-              </div>
-              <div class="card__meta">
-                <div class="meta-list">
-                  <span class="is-date">1 day ago</span><span>•</span>
-                  <span>Short</span><span>•</span>
-                  <span>Jennie Taer</span>
-                </div>
-                <button class="icon-btn" type="button" aria-label="More options">
-                  <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span>
-                </button>
+
+      <article class="card" data-kind="episode" data-host="Ben Shapiro" data-state-tag="">
+        <img class="card__avatar" src="assets/img/feed-av-show.png" alt="" width="48" height="48">
+        <div class="card__main">
+        <div class="card__meta">
+          <div class="meta-list">
+            <span class="byline">The Ben Shapiro Show</span><span>•</span>
+            <span>Ep. 1520</span><span>•</span>
+            <span>3 min ago</span>
+          </div>
+          <button class="icon-btn" type="button" aria-label="More options"><span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span></button>
+        </div>
+          <div class="card__text">
+            <h4 class="card__title">Ben Shapiro Reacts to Michelle Obama X Call Her Daddy Camps</h4>
+          </div>
+          <figure class="card__media">
+            <img src="assets/img/feed-thumb-ep.png" alt="" width="548" height="300">
+            <span class="card__badge">1h 20m</span>
+          </figure>
+        </div>
+      </article>
+
+      <article class="card card--promo" data-kind="promo" data-host="" data-state-tag="">
+        <img class="card__avatar" src="assets/img/feed-av-shop.png" alt="" width="48" height="48">
+        <div class="card__main">
+          <div class="card__text">
+            <h4 class="card__title">Daily Wire Best Sellers</h4>
+            <p class="card__desc">Live results and race calls from the Daily Wire newsroom — no panel, no hedging.</p>
+          </div>
+          <div class="product-strip">
+            <article class="product">
+              <img class="product__img" src="assets/img/prod-lions.png" alt="" width="235" height="235">
+              <div class="product__body">
+                <h5 class="product__name">Lions and Scavengers: The True Story of America (and Her Critics)</h5>
+                <p class="product__rating"><span class="stars" aria-hidden="true"><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star"></span></span>12 reviews</p>
+                <p class="product__price">$29.99</p>
               </div>
             </article>
+            <article class="product">
+              <img class="product__img" src="assets/img/prod-nowhere.png" alt="" width="235" height="235">
+              <div class="product__body">
+                <h5 class="product__name">Find Me Nowhere by Andrew Klavan</h5>
+                <p class="product__rating"><span class="stars" aria-hidden="true"><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star"></span></span>12 reviews</p>
+                <p class="product__price">$26.95</p>
+              </div>
+            </article>
+            <article class="product">
+              <img class="product__img" src="assets/img/prod-rosary.png" alt="" width="235" height="235">
+              <div class="product__body">
+                <h5 class="product__name">Theotokos Handmade Rosaries</h5>
+                <p class="product__rating"><span class="stars" aria-hidden="true"><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span></span>8 reviews</p>
+                <p class="product__price">$160.00</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" data-kind="article" data-host="Jennie Taer" data-state-tag="ME">
+        <img class="card__avatar" src="assets/img/feed-av-live.png" alt="" width="48" height="48">
+        <div class="card__main">
+        <div class="card__meta">
+          <div class="meta-list">
+            <span class="byline">Jennie Taer</span><span>•</span>
+            <span>Live blog</span><span>•</span>
+            <span>3 min ago</span>
+          </div>
+          <button class="icon-btn" type="button" aria-label="More options"><span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span></button>
+        </div>
+          <div class="card__text">
+            <h4 class="card__title">Maine Senate Race Tightens As Outside Money Pours Into Both Camps</h4>
+          <p class="card__desc">The FBI recently warned California authorities that Iran was potentially plotting “a surprise attack using unmanned aerial vehicles” targeting the West Coast in retaliation for a U.S. strike on the Iranian regime.</p>
+          </div>
+          <figure class="card__media">
+            <img src="assets/img/feed-thumb-live.png" alt="" width="548" height="308">
+            <span class="card__flag">NEW</span>
+          </figure>
+        </div>
+      </article>
+
+      <article class="card card--promo" data-kind="promo" data-host="" data-state-tag="">
+        <img class="card__avatar" src="assets/img/feed-av-book.png" alt="" width="48" height="48">
+        <div class="card__main">
+          <div class="card__text">
+            <h4 class="card__title">NEW Best Seller Release</h4>
+            <p class="card__desc">Enjoy and stay updated with Daily Wire</p>
+          </div>
+          <figure class="card__media card__media--offer">
+            <span class="card__flag">NEW</span>
+            <img src="assets/img/feed-promo-book.png" alt="" width="546" height="546">
+            <figcaption class="offer-bar">
+              <span class="offer-bar__text"><b>Find Me Nowhere by Andrew Klavan</b><span>$26.95</span></span>
+              <a class="btn btn--light" href="#">GET</a>
+            </figcaption>
+          </figure>
+        </div>
+      </article>
           </div>
         </section>
 
         <div class="ad-slot">Advertisement</div>
 
         <section class="day-group">
+          <h3 class="day-group__label">Monday, August 17</h3>
           <div class="day-group__list">
 
-            <article class="card" data-kind="episode" data-host="Ben Shapiro" data-state-tag="">
-              <div class="card__body">
-                <div class="card__text">
-                  <h4 class="card__title">Ben Shapiro Reacts to Michelle Obama X Call Her Daddy Camps</h4>
-                </div>
-                <div class="card__thumb card__thumb--episode">
-                  <img src="assets/img/img19_Episode-thumb.png" alt="" width="208" height="114">
-                  <span class="card__badge">1h 20m</span>
-                </div>
-              </div>
-              <div class="card__meta">
-                <div class="meta-list">
-                  <span class="is-date">1 day ago</span><span>•</span>
-                  <span>Ep. 50</span><span>•</span>
-                  <span>The Ben Shapiro Show</span>
-                </div>
-                <button class="icon-btn" type="button" aria-label="More options">
-                  <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span>
-                </button>
+      <article class="card card--promo" data-kind="promo" data-host="" data-state-tag="">
+        <img class="card__avatar" src="assets/img/feed-av-night.png" alt="" width="48" height="48">
+        <div class="card__main">
+          <div class="card__text">
+            <h4 class="card__title">Election night, called straight.</h4>
+            <p class="card__desc">Live results and race calls from the Daily Wire newsroom — no panel, no hedging.</p>
+          </div>
+          <div class="product-strip">
+            <article class="product">
+              <img class="product__img" src="assets/img/prod-lions.png" alt="" width="235" height="235">
+              <div class="product__body">
+                <h5 class="product__name">Lions and Scavengers: The True Story of America (and Her Critics)</h5>
+                <p class="product__rating"><span class="stars" aria-hidden="true"><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star"></span></span>12 reviews</p>
+                <p class="product__price">$29.99</p>
               </div>
             </article>
-
-            <article class="card" data-kind="opinion" data-host="Ben Shapiro" data-state-tag="">
-              <div class="card__body">
-                <div class="card__text">
-                  <h4 class="card__title">Inside The 29: How The Closest House Races Were Chosen</h4>
-                  <p class="card__desc">The methodology behind the curated district list — and what it leaves out on purpose.</p>
-                </div>
-                <div class="card__thumb">
-                  <img src="assets/img/img22_Thumbnail.png" alt="" width="203" height="114">
-                </div>
-              </div>
-              <div class="card__meta">
-                <div class="meta-list">
-                  <span class="is-date">1 day ago</span><span>•</span>
-                  <span>5 min</span><span>•</span>
-                  <span class="byline"><img src="assets/img/img23_Host-Image.png" alt="" width="24" height="24">Ben Shapiro</span>
-                </div>
-                <button class="icon-btn" type="button" aria-label="More options">
-                  <span class="icon" style="-webkit-mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg);mask-image:url(assets/icons/icon_tabler-icon-dots-vertical.svg)"></span>
-                </button>
+            <article class="product">
+              <img class="product__img" src="assets/img/prod-nowhere.png" alt="" width="235" height="235">
+              <div class="product__body">
+                <h5 class="product__name">Find Me Nowhere by Andrew Klavan</h5>
+                <p class="product__rating"><span class="stars" aria-hidden="true"><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star"></span></span>12 reviews</p>
+                <p class="product__price">$26.95</p>
               </div>
             </article>
-
+            <article class="product">
+              <img class="product__img" src="assets/img/prod-beanie.png" alt="" width="235" height="235">
+              <div class="product__body">
+                <h5 class="product__name">Wool Beanie</h5>
+                <p class="product__rating"><span class="stars" aria-hidden="true"><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star is-on"></span><span class="star"></span></span>3 reviews</p>
+                <p class="product__price">$160.00</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </article>
             <button class="btn btn--outline load-more" type="button">Load more coverage</button>
           </div>
         </section>
@@ -393,7 +457,7 @@
     <div class="footer-links">
       <div class="footer-links__cols">
         <nav class="footer-links__col" aria-label="Content">
-          <a href="#">News</a><a href="#">Shows &amp; Movies</a><a href="#">Shop</a><a href="#">Kids</a>
+          <a href="#">News</a><a href="#">Shows &amp; Movies</a><a href="#">The Midterms</a>
         </nav>
         <nav class="footer-links__col" aria-label="Company">
           <a href="#">About</a><a href="#">Advertise WIth Us</a><a href="#">Authors</a><a href="#">Book our Speakers</a><a href="#">Careers</a><a href="#">Contact Support</a><a href="#">Gift Membership</a>

@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Election Hub — map variations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<style>
+  /* Scratch page: four treatments of the same map, same data, same ramp, so
+     they can be compared side by side. Not part of the product. */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 32px 96px;
+    background: var(--color-background-neutral-bold);
+    color: var(--color-text-neutral-bold);
+    font-family: "Libre Franklin", system-ui, sans-serif;
+  }
+  h1 { font-size: 24px; font-weight: 600; margin: 0 0 4px; }
+  .sub { font-size: 14px; color: var(--color-text-neutral-subtlest); margin: 0 0 32px; }
+
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+  .toolbar button {
+    height: 40px; padding: 0 18px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--color-border-neutral-bold);
+    background: none; color: var(--color-text-neutral-bold);
+    font: inherit; font-size: 14px;
+    transition: background-color 200ms ease, border-color 200ms ease;
+  }
+  .toolbar button[aria-pressed="true"] {
+    background: var(--color-background-inverse-bold);
+    color: var(--color-text-inverse-bold);
+    border-color: transparent;
+  }
+
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+
+  .v { display: flex; flex-direction: column; gap: 12px; }
+  .v__head { display: flex; align-items: baseline; gap: 10px; }
+  .v__n { font-size: 12px; color: var(--color-text-neutral-subtlest); letter-spacing: .06em; }
+  .v__t { font-size: 16px; font-weight: 600; }
+  .v__d { font-size: 13px; line-height: 1.5; color: var(--color-text-neutral-subtlest); margin: 0; }
+
+  .card {
+    position: relative;
+    background: var(--color-background-neutral-subtle);
+    border-radius: 8px;
+    aspect-ratio: 1312 / 811;
+    overflow: hidden;
+  }
+  .card svg { width: 100%; height: 100%; display: block; }
+
+  /* ---- shared state painting ---- */
+  .st, .dot { transition: fill 300ms var(--ease), opacity 300ms var(--ease); cursor: pointer; }
+  .lbl, .dlbl { pointer-events: none; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+
+  .card.sel .state:not(.on) { opacity: .5; }
+  /* Off-ballot dots are nearly the card colour; without a rim the grid reads as
+     full of holes instead of full of states with nothing on the ballot. */
+  .dot[data-inert] { stroke: rgba(255,255,255,.14); stroke-width: 1; }
+  :root[data-theme="light"] .dot[data-inert] { stroke: rgba(0,0,0,.16); }
+  .state.on .st, .state.on .dot {
+    stroke: var(--color-border-inverse-bold);
+    stroke-width: 2;
+    paint-order: stroke fill;
+  }
+  .st { stroke: var(--state-border); stroke-width: .6; vector-effect: non-scaling-stroke; }
+
+  .readout {
+    position: absolute; left: 16px; bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 8px;
+    background: #f2f2f2; color: #0a0909;
+    font-size: 13px; opacity: 0; transition: opacity 200ms ease;
+  }
+  .readout.on { opacity: 1; }
+  .readout i { width: 12px; height: 12px; border-radius: 3px; }
+  .readout b { font-weight: 600; }
+
+  .h2 { font-size: 18px; font-weight: 600; margin: 8px 0 20px; }
+  #tops { margin-bottom: 48px; }
+  .top {
+    background: var(--color-background-neutral-subtle);
+    border-radius: 8px; padding: 28px 26px;
+    display: flex; flex-direction: column; gap: 18px; min-height: 232px;
+  }
+  .top__line { font-size: 22px; font-weight: 600; line-height: 1.25; max-width: 30ch; }
+  .top__line em { font-style: normal; color: var(--color-text-neutral-subtlest); font-weight: 400; }
+  .top__meta { font-size: 12px; color: var(--color-text-neutral-subtlest); }
+  .spread { display: flex; flex-wrap: wrap; gap: 5px; }
+  .spread i { width: 15px; height: 15px; border-radius: 50%; }
+  .bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; }
+  .bar i { height: 100%; }
+  .ramp { display: flex; height: 26px; border-radius: 13px; overflow: hidden; }
+  .ramp i { flex: 1; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 40px; font-size: 13px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 22px; height: 12px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>Map variations</h1>
+<p class="sub">Same states, same ratings, same 10-step ramp from “Map Final”. Click any state — every treatment stays selectable.</p>
+
+<div class="toolbar" id="themeBar">
+  <button type="button" data-theme-set="dark" aria-pressed="true">Dark</button>
+  <button type="button" data-theme-set="light" aria-pressed="false">Light</button>
+</div>
+
+<h2 class="h2">The top — how the spread reads</h2>
+<div class="grid" id="tops"></div>
+
+<h2 class="h2">The map</h2>
+<div class="grid" id="grid"></div>
+
+<div class="legend" id="legend"></div>
+
+<script src="js/data.js"></script>
+<script>
+(function () {
+  /* The ramp read off the "Map Final" frame (8618:1048147): ten seat colours,
+     five each side, meeting in the dark middle. Brightness is distance between
+     the parties — bright ends are the comfortable races. */
+  const RAMP = ["#01cefb", "#0f45db", "#0017a3", "#001b7e", "#17075d",
+                "#33003b", "#65003a", "#99003b", "#cc003b", "#fc002c"];
+
+  /* Seven categories onto seven of the ten steps, symmetric about the middle. */
+  const FILL = {
+    "safe-d": RAMP[0], "likely-d": RAMP[1], "lean-d": RAMP[2],
+    "tossup": RAMP[4], "lean-r": RAMP[6], "likely-r": RAMP[8], "safe-r": RAMP[9],
+    nodata: "#8f8f8f", off: "var(--rating-off)", blank: "var(--rating-blank)"
+  };
+  const INK = {
+    "safe-d": "#0a0909", "likely-d": "#fafafa", "lean-d": "#fafafa",
+    tossup: "#fafafa", "lean-r": "#fafafa", "likely-r": "#fafafa", "safe-r": "#0a0909",
+    nodata: "#0a0909", off: "#a3a3a3", blank: "#a3a3a3"
+  };
+  const LABEL = {
+    "safe-d": "Safe D", "likely-d": "Likely D", "lean-d": "Lean D", tossup: "Toss-up",
+    "lean-r": "Lean R", "likely-r": "Likely R", "safe-r": "Safe R",
+    nodata: "No data", off: "Not on ballot", blank: "Not on ballot"
+  };
+
+  /* Classic US tile grid — one cell per state, geography abstracted away. */
+  const TILES = [
+    "AK .  .  .  .  .  .  .  .  .  ME",
+    ".  .  .  .  .  .  .  .  .  VT NH",
+    "WA ID MT ND MN IL WI MI NY RI MA",
+    "OR NV WY SD IA IN OH PA NJ CT .",
+    "CA UT CO NE MO KY WV VA MD DE .",
+    ".  AZ NM KS AR TN NC SC DC .  .",
+    ".  .  .  OK LA MS AL GA .  .  .",
+    "HI .  .  TX .  .  .  FL .  .  ."
+  ].map(r => r.trim().split(/\s+/));
+
+  const VARIANTS = [
+    { id: "geo", n: "01", t: "Geographic", d: "The shapes as they are today, on the new ramp. Most faithful to the country, least even — a reader's eye goes to the big empty states." },
+    { id: "bubble", n: "02", t: "Bubbles on the map", d: "One circle per state, sitting where the state sits, sized by how much is at stake. Geography survives, but the weight is in the seats, not the acreage." },
+    { id: "tiles", n: "03", t: "Tile grid", d: "One equal circle per state, geography abstracted to a grid. Rhode Island reads as loudly as Texas — the fairest of the four for a seat count." },
+    { id: "both", n: "04", t: "Shapes plus dots", d: "The outline stays as a faint ground; the dot carries the rating. You keep the map you recognise and the weighting at the same time." }
+  ];
+
+  let boxes = null, shapes = null, selected = null;
+
+  Promise.all([
+    fetch("assets/state-boxes.json").then(r => r.json()),
+    fetch("assets/map-desktop.svg").then(r => r.text()),
+    fetch("assets/ratings.json").then(r => r.json())
+  ]).then(([b, svgText, ratings]) => {
+    boxes = b.desktop;
+    const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
+    shapes = {};
+    doc.querySelectorAll(".state").forEach(g => {
+      shapes[g.dataset.state] = g.querySelector(".st").getAttribute("d");
+    });
+    build(ratings, b.desktop_origin);
+    buildTops();
+    buildLegend();
+  });
+
+  function svgEl(name, attrs) {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (const k in attrs) if (attrs[k] !== undefined) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function build(ratings, origin) {
+    const grid = document.getElementById("grid");
+    VARIANTS.forEach(v => {
+      const wrap = document.createElement("div");
+      wrap.className = "v";
+      wrap.innerHTML =
+        '<div class="v__head"><span class="v__n">' + v.n + '</span><span class="v__t">' + v.t + '</span></div>' +
+        '<div class="card" id="card-' + v.id + '"><div class="readout"><i></i><span></span></div></div>' +
+        '<p class="v__d">' + v.d + '</p>';
+      grid.appendChild(wrap);
+
+      const card = wrap.querySelector(".card");
+      const svg = svgEl("svg", { viewBox: "0 0 1312 811", preserveAspectRatio: "xMidYMid meet" });
+      card.insertBefore(svg, card.firstChild);
+      draw(svg, v.id, ratings, origin);
+    });
+  }
+
+  function draw(svg, kind, ratings, origin) {
+    const shift = svgEl("g", { transform: "translate(" + origin[0] + "," + origin[1] + ")" });
+    svg.appendChild(shift);
+
+    /* geographic-ish variants share the state anchors from state-boxes.json:
+       [x, y, w, h, anchorX, anchorY, inscribedRadius] */
+    Object.keys(shapes).forEach(code => {
+      const box = boxes[code];
+      if (!box) return;
+      const r = ratings[code] || "off";
+      const g = svgEl("g", { class: "state", "data-state": code, tabindex: 0, role: "button", "aria-label": code });
+
+      if (kind === "geo" || kind === "both") {
+        g.appendChild(svgEl("path", {
+          class: "st",
+          d: shapes[code],
+          fill: kind === "both" ? "var(--rating-off)" : FILL[r],
+          opacity: kind === "both" ? 0.75 : 1
+        }));
+      }
+
+      if (kind === "geo") {
+        if (box[2] >= 34 && box[3] >= 22) {
+          const t = svgEl("text", { class: "lbl", x: box[4], y: box[5], "font-size": 11, fill: INK[r] });
+          t.textContent = code;
+          g.appendChild(t);
+        }
+      }
+
+      if (kind === "bubble" || kind === "both") {
+        /* Radius from the inscribed circle, so a big state gets a big dot, but
+           compressed hard (square root) or Texas swallows its neighbours. */
+        const rad = Math.max(10, Math.min(36, Math.sqrt(box[6]) * 5.4));
+        g.appendChild(svgEl("circle", {
+          class: "dot", cx: box[4], cy: box[5], r: rad, fill: FILL[r],
+          "data-inert": (r === "off" || r === "blank") ? "" : undefined
+        }));
+        if (rad >= 13) {
+          const t = svgEl("text", { class: "dlbl", x: box[4], y: box[5], "font-size": Math.min(14, rad * 0.62), fill: INK[r] });
+          t.textContent = code;
+          g.appendChild(t);
+        }
+      }
+
+      if (kind !== "tiles") shift.appendChild(g);
+    });
+
+    if (kind === "tiles") {
+      const cell = 88, pad = 6;
+      const cols = 11, rows = TILES.length;
+      const gw = cols * cell, gh = rows * cell;
+      const gx = (1312 - gw) / 2, gy = (811 - gh) / 2;
+      const tg = svgEl("g", { transform: "translate(" + gx + "," + gy + ")" });
+      svg.appendChild(tg);
+
+      TILES.forEach((row, ri) => row.forEach((code, ci) => {
+        if (code === ".") return;
+        const r = ratings[code] || "off";
+        const g = svgEl("g", { class: "state", "data-state": code, tabindex: 0, role: "button", "aria-label": code });
+        const cx = ci * cell + cell / 2, cy = ri * cell + cell / 2;
+        g.appendChild(svgEl("circle", {
+          class: "dot", cx: cx, cy: cy, r: (cell - pad * 2) / 2, fill: FILL[r],
+          "data-inert": (r === "off" || r === "blank") ? "" : undefined
+        }));
+        const t = svgEl("text", { class: "dlbl", x: cx, y: cy, "font-size": 20, fill: INK[r] });
+        t.textContent = code;
+        g.appendChild(t);
+        tg.appendChild(g);
+      }));
+    }
+
+    svg.addEventListener("click", ev => {
+      const g = ev.target.closest(".state");
+      if (!g) return;
+      pick(g.dataset.state, ratings);
+    });
+  }
+
+  function pick(code, ratings) {
+    selected = selected === code ? null : code;
+    document.querySelectorAll(".card").forEach(card => {
+      card.classList.toggle("sel", !!selected);
+      card.querySelectorAll(".state").forEach(g => g.classList.toggle("on", g.dataset.state === selected));
+      const out = card.querySelector(".readout");
+      if (!selected) { out.classList.remove("on"); return; }
+      const r = ratings[selected] || "off";
+      const d = window.EH.build(selected, r, "house", "polymarket");
+      out.classList.add("on");
+      out.querySelector("i").style.background = FILL[r];
+      out.querySelector("span").innerHTML =
+        "<b>" + d.name + "</b> — " + LABEL[r] + (r === "off" || r === "blank" ? "" : " · " + d.margin);
+    });
+  }
+
+  /* The top of "Map Final": 70 dots, 44px, thirteen to a row, carrying the same
+     ramp. Three ways to say the same number. */
+  function buildTops() {
+    const DEM = 32, TOSS = 6, REP = 32;   /* 70 dots, split to match the seat bar */
+    function dots(n, from, to) {
+      let out = "";
+      for (let i = 0; i < n; i++) {
+        const t = n === 1 ? 0 : i / (n - 1);
+        out += '<i style="background:' + RAMP[Math.round(from + t * (to - from))] + '"></i>';
+      }
+      return out;
+    }
+    const spread = dots(DEM, 0, 3) + dots(TOSS, 4, 5) + dots(REP, 6, 9);
+
+    const tops = [
+      { n: "01", t: "Dots as the whole story",
+        html: '<div class="top__line">Polymarket predicts a <em>53% chance</em> Democrats take the House.</div>' +
+              '<div class="spread">' + spread + '</div>' +
+              '<div class="top__meta">70 seats in play · each dot one seat, coloured by how safe it is</div>' },
+      { n: "02", t: "Dots plus the bar",
+        html: '<div class="top__line">Polymarket predicts a <em>53% chance</em> Democrats take the House.</div>' +
+              '<div class="spread">' + spread + '</div>' +
+              '<div class="bar"><i style="width:48.7%;background:' + RAMP[1] + '"></i>' +
+              '<i style="width:1.4%;background:' + RAMP[4] + '"></i>' +
+              '<i style="width:49.9%;background:' + RAMP[8] + '"></i></div>' +
+              '<div class="top__meta">Democrats 470 · Toss-ups 60 · Republicans 1,000</div>' },
+      { n: "03", t: "Continuous ramp",
+        html: '<div class="top__line">Polymarket predicts a <em>53% chance</em> Democrats take the House.</div>' +
+              '<div class="ramp">' + RAMP.map(c => '<i style="background:' + c + '"></i>').join("") + '</div>' +
+              '<div class="top__meta">No seats, just the gradient — the bar becomes the legend</div>' }
+    ];
+
+    document.getElementById("tops").innerHTML = tops.map(t =>
+      '<div class="v"><div class="v__head"><span class="v__n">' + t.n + '</span>' +
+      '<span class="v__t">' + t.t + '</span></div>' +
+      '<div class="top">' + t.html + '</div></div>').join("");
+  }
+
+  function buildLegend() {
+    const el = document.getElementById("legend");
+    el.innerHTML = RAMP.map((c, i) =>
+      '<span><i style="background:' + c + '"></i>' + (i + 1) + "</span>"
+    ).join("") + '<span style="color:var(--color-text-neutral-subtlest)">← Democrats · Republicans →</span>';
+  }
+
+  document.getElementById("themeBar").addEventListener("click", ev => {
+    const b = ev.target.closest("[data-theme-set]");
+    if (!b) return;
+    document.documentElement.setAttribute("data-theme", b.dataset.themeSet);
+    document.querySelectorAll("[data-theme-set]").forEach(x =>
+      x.setAttribute("aria-pressed", String(x === b)));
+  });
+})();
+</script>
+</body>
+</html>
