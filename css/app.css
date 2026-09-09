@@ -1782,10 +1782,12 @@ body.is-locked {
   margin-bottom: var(--space-5xl);
 }
 .countdown__cell { display: flex; flex-direction: column; align-items: center; }
+/* The frame's own numbers: 56 SemiBold over a 24 Regular unit, both at 120%
+   and flush — the two line boxes touch, there is no gap between them. */
 .countdown__cell u {
   text-decoration: none;
-  font-size: 64px;
-  font-weight: var(--font-weight-regular);
+  font-size: 56px;
+  font-weight: var(--font-weight-semibold);
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
   color: var(--color-text-neutral-bold);
@@ -1825,7 +1827,10 @@ body.is-locked {
 @media (prefers-reduced-motion: reduce) {
   .digit__glyph { animation: none !important; }
 }
-.countdown__cell span {
+/* `.countdown__unit`, not a bare `span`: every numeral is a span too, so
+   this rule was setting the digits to the unit's 24px — which is why they
+   stayed small however large the <u> was set. */
+.countdown__unit {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-regular);
   line-height: 1.2;
@@ -1911,8 +1916,8 @@ body.is-locked {
     margin-top: calc(var(--space-lg) * -1);
     margin-bottom: var(--space-3xl);
   }
-  .countdown__cell u { font-size: var(--font-size-2xl); }
-  .countdown__cell span { font-size: var(--font-size-xs); }
+  .countdown__cell u { font-size: 32px; }
+  .countdown__unit { font-size: var(--font-size-sm); }
   .statement { flex-direction: column; align-items: flex-start; gap: var(--space-3xl); }
   .statement__text { font-size: var(--font-size-xl); }
   .statement__pick .icon { width: 20px; height: 20px; }
@@ -1921,7 +1926,10 @@ body.is-locked {
 
 /* ---- the sentence's picks ARE the selects; the map card has no chips ---- */
 
-.statement__field { position: relative; display: inline-block; }
+/* The menu drops over the seats grid that follows it in the DOM — and the
+   grid's dots take a z-index of their own on hover, so the field has to win
+   outright rather than rely on paint order. */
+.statement__field { position: relative; display: inline-block; z-index: 20; }
 
 .statement__pick {
   display: inline-flex;
