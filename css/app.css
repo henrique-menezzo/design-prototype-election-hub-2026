@@ -729,26 +729,6 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 }
 .star.is-on { opacity: 1; background: var(--color-text-neutral-bold); }
 
-/* The in-feed slot is the same ad unit as the rails, laid on its side: the
-   frame draws no ad inside the feed, so it borrows the rail's treatment
-   rather than inventing a second one. */
-.ad-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-.ad-slot__label {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-neutral-subtlest);
-}
-.ad-slot__box {
-  width: 100%;
-  height: 130px;
-  background: var(--color-background-neutral-subtle);
-  border: 1px solid var(--color-border-neutral-bold);
-}
-
 
 /* The rail follows the feed down the page. 64 clears the sticky header (64
    tall) with 24 to spare. */
@@ -1415,7 +1395,6 @@ body.is-locked {
 .chip-menu,
 .map-zoom__btn,
 .dwplus,
-.ad-slot__box,
 .coverage__rail-box,
 .site-header,
 .site-footer,
