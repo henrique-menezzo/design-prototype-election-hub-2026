@@ -798,8 +798,9 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
      card and the DW+ band 16px further in than every other block. */
   .map-block { gap: var(--space-xl); }
   .map-card {
-    /* 361 × 410 in Figma */
-    aspect-ratio: 361 / 410;
+    /* 361 × 316: the frame's 410 included 94 of empty space above the map,
+       where the race and source chips used to sit */
+    aspect-ratio: 361 / 316;
   }
 
   /* pills centred across the card */
@@ -1748,8 +1749,13 @@ body.is-locked {
   from { transform: scaleX(0); }
   to   { transform: none; }
 }
+/* A soft overshoot rather than the shared ease: the dot settles into size
+   instead of snapping to it, and it drifts down a few pixels on the way in so
+   the fill still reads as coming from above. */
+:root { --dot-ease: cubic-bezier(0.32, 1.5, 0.5, 1); }
 @keyframes dot-in {
-  from { opacity: 0; transform: scale(0); }
+  from { opacity: 0; transform: translateY(-5px) scale(0.3); }
+  60%  { opacity: 1; }
   to   { opacity: 1; transform: none; }
 }
 
@@ -1872,6 +1878,9 @@ body.is-locked {
 }
 
 @media (max-width: 900px) {
+  /* the tabler chevron is drawn small inside a 24 box, so the mask carries
+     its own padding — 12 of gap on top of that reads as a gulf at 20px */
+  .statement__pick { gap: 0; }
   .statement__pick .icon { width: 20px; height: 20px; }
   .statement__field .chip-menu { font-size: var(--font-size-sm); }
 }

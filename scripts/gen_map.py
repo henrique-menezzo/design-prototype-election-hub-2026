@@ -34,7 +34,10 @@ MAP_W, MAP_H = 975.0, 610.0
 
 # Where each breakpoint's card puts the map: (x, y, width, height).
 DESKTOP_BOX = (32.0, 26.0, 1248.0, 759.0)     # inside the 1312 x 811 card
-MOBILE_BOX = (2.0, 96.0, 357.0, 232.0)        # inside the 361 x 410 card
+# The frame put the map at y=96 to clear the race/source chips that used to sit
+# above it inside the card. Those chips are the sentence's pickers now, so the
+# map moves up and the card loses the 94 of dead space that was left at the top.
+MOBILE_BOX = (2.0, 16.0, 357.0, 232.0)        # inside the 361 x 316 card
 
 # Label size on screen, in CSS pixels, and the smallest on-screen box that may
 # carry one. Fixed per breakpoint rather than per state — sizing each label off
@@ -256,7 +259,7 @@ if __name__ == "__main__":
                               OUT + "map-desktop.svg", "0 0 1312 811", DESKTOP_BOX,
                               DESKTOP_LABEL)
     mobile, m_origin = build(shapes, ratings, anchors,
-                             OUT + "map-mobile.svg", "0 0 361 410", MOBILE_BOX,
+                             OUT + "map-mobile.svg", "0 0 361 316", MOBILE_BOX,
                              MOBILE_LABEL)
 
     json.dump({"desktop": desktop, "mobile": mobile,

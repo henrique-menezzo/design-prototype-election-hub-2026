@@ -22,8 +22,9 @@
      the element at the end, or the dots would keep the entrance transform
      and their hover would have nothing left to animate. */
   const INTRO = {
-    title: 40,
-    presented: 180,
+    /* the byline sits above the headline, so it arrives first */
+    presented: 40,
+    title: 110,
     rule: 260,
     countdown: 360,
     statement: 520,
@@ -802,12 +803,18 @@
     if (seatsIntro) {
       seatsIntro = false;
       if (marginBig) splitLetters(marginBig, INTRO.margin, 44);
-      /* row by row, top to bottom: the delay follows the row alone, so each
-         line of dots grows in together and the fill reads as it fills down */
+      /* Row by row, top to bottom. The row is the delay's main term, but a
+         whole row landing on one frame drew a hard bar sweeping down the
+         grid, so each dot also carries a small lean across the row and a
+         deterministic jitter — enough to break the line without losing the
+         downward read. */
       const dots = seatsGrid.children;
       for (let i = 0; i < dots.length; i++) {
-        dots[i].style.animation = "dot-in 380ms var(--ease) " +
-          (INTRO.dots + Math.floor(i / cols) * 34) + "ms backwards";
+        const row = Math.floor(i / cols);
+        const col = i % cols;
+        const jitter = ((i * 2654435761) % 1000) / 1000 * 26;
+        dots[i].style.animation = "dot-in 520ms var(--dot-ease) " +
+          Math.round(INTRO.dots + row * 30 + col * 1.6 + jitter) + "ms backwards";
       }
     }
   }
