@@ -420,6 +420,9 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 
 /* ========================= DW+ BAND ========================= */
 
+/* "Section - DW+ election plan offer" (8633:1053501): 1312x164, #151515 on an
+   8 radius, 40 all round — a dark band with the 26 mark, not the red block it
+   was drawn as here. */
 .dwplus {
   display: flex;
   align-items: center;
@@ -427,25 +430,17 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   gap: var(--space-6xl);
   padding: var(--space-5xl);
   border-radius: var(--radius-md);
-  background: var(--color-background-brand-subtlest);
+  background: var(--color-background-neutral-subtle);
 }
-.dwplus__left { display: flex; align-items: flex-start; gap: var(--space-5xl); }
-.dwplus__badge {
-  width: 81px; height: 81px;
-  flex: none;
-  display: grid;
-  place-items: center;
-  border-radius: 5.7px;
-  background: var(--color-background-brand-subtlest-hovered);
-  color: var(--color-icon-neutral-bold);
-}
-.dwplus__badge img { width: 35px; }
+.dwplus__left { display: flex; align-items: center; gap: var(--space-5xl); }
+.dwplus__mark { flex: none; width: 97px; height: 83px; }
 .dwplus__text { display: flex; flex-direction: column; gap: var(--space-md); }
 .dwplus__title {
   margin: 0;
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
   line-height: 1.2;
+  color: var(--color-text-neutral-bold);
 }
 .dwplus__body {
   margin: 0;
@@ -454,7 +449,7 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   line-height: 1.5;
   max-width: 493px;
 }
-.dwplus__actions { display: flex; gap: var(--space-lg); flex: none; }
+.dwplus__actions { display: flex; gap: var(--space-lg); flex: none; align-items: center; }
 
 .btn {
   display: inline-flex;
@@ -758,28 +753,17 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   z-index: 30;
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-3xl);
   padding: var(--space-4xl) var(--space-8xl);
   background: var(--color-background-neutral-subtle);
   border-top: 1px solid var(--color-border-neutral-bold);
 }
-.game-bar__states {
-  display: grid;
-  grid-template-columns: repeat(2, 22px);
-  gap: var(--space-xs);
-  flex: none;
-}
-.game-bar__state {
-  width: 22px; height: 22px;
-  display: grid; place-items: center;
-  font-size: 8px;
-  font-weight: 700;
-  color: #fff;
-}
-.game-bar__state.is-light { color: #0a0909; }
-.game-bar__text { flex: 1; display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
-.game-bar__title { font-size: var(--font-size-md); font-weight: var(--font-weight-medium); line-height: 1.5; }
-.game-bar__sub { font-size: var(--font-size-xs); line-height: 1.4; color: var(--color-text-neutral-subtlest); }
+/* the frame's own bar (8804:113358): the seat hemicycle on the left, not the
+   four state chips that were standing in for it */
+.game-bar__mark { flex: none; width: 92px; height: 45px; }
+.game-bar__text { flex: 1; display: flex; flex-direction: column; gap: var(--space-md); min-width: 0; }
+.game-bar__title { font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); line-height: 1.2; }
+.game-bar__sub { font-size: var(--font-size-sm); line-height: 1.2; color: var(--color-text-neutral-subtlest); }
 
 /* ================================================================== *
  * MOBILE — Figma's 393 frame
@@ -861,8 +845,7 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
     padding: var(--space-xl) 18px var(--space-3xl);
   }
   .dwplus__left { gap: var(--space-xl); }
-  .dwplus__badge { width: 57px; height: 57px; border-radius: var(--radius-sm); }
-  .dwplus__badge img { width: 25px; }
+  .dwplus__mark { width: 58px; height: 50px; }
   .dwplus__text { gap: var(--space-xs); }
   .dwplus__title { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
   .dwplus__body { font-size: var(--font-size-xs); }
@@ -922,8 +905,7 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
     padding: var(--space-xl);
     gap: var(--space-lg);
   }
-  .game-bar__states { grid-template-columns: repeat(2, 14px); }
-  .game-bar__state { width: 14px; height: 14px; font-size: 6px; }
+  .game-bar__mark { width: 56px; height: 27px; }
   .game-bar__title { font-size: var(--font-size-xs); }
   .game-bar__sub { display: none; }
   .game-bar .btn { height: 34px; padding-inline: var(--space-xl); font-size: var(--font-size-xs); }
@@ -1669,7 +1651,6 @@ body.is-locked {
   :root:not([data-theme="dark"]) .hero__presented img { filter: invert(1); }
 }
 
-.hero__mark { flex: none; width: 130px; height: 111px; }
 
 /* Countdown: four cells spread edge to edge across the full 1312, each with
    the number over its unit. The label is the unit, on its own line under the
@@ -1838,14 +1819,9 @@ body.is-locked {
 }
 
 @media (max-width: 900px) {
-  /* one line, always: 393 minus 16 of padding either side and the 78 mark
-     leaves ~250, and "The Midterms" needs the size to follow the box rather
-     than break in two. */
-  .hero__title {
-    font-size: clamp(26px, 8.6vw, var(--font-size-3xl));
-    white-space: nowrap;
-  }
-  .hero__mark { width: 78px; height: 67px; }
+  /* one line, always — the 26 mark no longer shares the row, so the full 40
+     fits inside 393 with room to spare */
+  .hero__title { font-size: var(--font-size-3xl); white-space: nowrap; }
   .countdown {
     gap: var(--space-md);
     margin-top: calc(var(--space-lg) * -1);

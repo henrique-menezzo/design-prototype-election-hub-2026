@@ -23,8 +23,7 @@
      and their hover would have nothing left to animate. */
   const INTRO = {
     title: 40,
-    mark: 140,
-    presented: 230,
+    presented: 180,
     rule: 260,
     countdown: 360,
     statement: 520,
@@ -61,7 +60,6 @@
   if (!introStill) {
     const title = document.querySelector(".hero__title");
     if (title) splitLetters(title, INTRO.title, 26);
-    rise(".hero__mark", INTRO.mark);
     rise(".hero__presented", INTRO.presented);
     rise(".statement__text", INTRO.statement);
 
