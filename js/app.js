@@ -6,6 +6,12 @@
   const root = document.documentElement;
   const STORAGE_KEY = "dw-election-theme";
 
+  /* The map and its boxes are fetched, not linked, so they miss the query the
+     stylesheet links carry — and Pages caches them for ten minutes. */
+  function assetV() {
+    return window.EH_ASSET_V ? "?v=" + window.EH_ASSET_V : "";
+  }
+
   /* ============================== INTRO ==============================
      One curtain-up on load: the headline sets itself letter by letter, the
      rule wipes out from the left, the countdown rolls in, the forecast rises
@@ -486,7 +492,7 @@
   let view = { s: 1, x: 0, y: 0 };
   let ballot = [];           /* navigable states, alphabetical */
 
-  fetch("assets/state-boxes.json")
+  fetch("assets/state-boxes.json" + assetV())
     .then(function (r) { return r.json(); })
     .then(function (json) {
       boxes = json;
@@ -1281,7 +1287,7 @@
     if (geoKey === key) return;
     geoKey = key;
     if (cache[key]) { slot.innerHTML = cache[key]; afterLoad(); return; }
-    fetch("assets/map-" + key + ".svg")
+    fetch("assets/map-" + key + ".svg" + assetV())
       .then(function (r) { return r.text(); })
       .then(function (text) {
         cache[key] = text;

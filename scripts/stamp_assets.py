@@ -14,6 +14,9 @@ import re
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAGE = ROOT / "index.html"
 ASSETS = ["css/tokens.css", "css/app.css", "js/data.js", "js/app.js"]
+# fetched at runtime by js/app.js rather than linked, so they carry one shared
+# version stamped into a global instead of a query in the markup
+FETCHED = ["assets/map-desktop.svg", "assets/map-mobile.svg", "assets/state-boxes.json"]
 
 
 def digest(rel):
@@ -22,6 +25,17 @@ def digest(rel):
 
 def main():
     html = PAGE.read_text(encoding="utf-8")
+
+    joint = hashlib.sha1()
+    for rel in FETCHED:
+        joint.update((ROOT / rel).read_bytes())
+    tag = joint.hexdigest()[:8]
+    html, n = re.subn(r'window\.EH_ASSET_V = "[0-9a-f]+";',
+                      'window.EH_ASSET_V = "' + tag + '";', html)
+    if not n:
+        raise SystemExit("no EH_ASSET_V to stamp")
+    print("fetched assets", tag)
+
     for rel in ASSETS:
         pattern = re.compile(r'(["\'])' + re.escape(rel) + r'(\?v=[0-9a-f]+)?\1')
         html, n = pattern.subn(lambda m: m.group(1) + rel + "?v=" + digest(rel) + m.group(1), html)
