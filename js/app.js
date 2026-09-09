@@ -61,18 +61,75 @@
   };
   if (cd.d && cd.h && cd.m && cd.s) {
     const pad = function (n) { return n < 10 ? "0" + n : String(n); };
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const ROLL = 420;   /* must match --dur-medium */
+    const STEP = 70;    /* stagger between digits, so they land one by one */
 
-    function paint(el, value) {
-      if (el.textContent !== value) el.textContent = value;
+    /* Each numeral is its own slot: the outgoing glyph leaves downwards while
+       the incoming one arrives from above, so a tick reads as the digits
+       rolling rather than the text swapping. Only the digits that actually
+       changed move — at :59 the whole cell rolls, at :51 only the units. */
+    function glyph(ch) {
+      const g = document.createElement("span");
+      g.className = "digit__glyph";
+      g.textContent = ch;
+      return g;
+    }
+
+    function build(el, value, order) {
+      el.textContent = "";
+      for (let i = 0; i < value.length; i++) {
+        const slot = document.createElement("span");
+        slot.className = "digit";
+        slot.dataset.v = value[i];
+        const g = glyph(value[i]);
+        if (!still) {
+          g.style.animation = "digit-in " + ROLL + "ms var(--ease) " +
+            ((order * value.length + i) * STEP) + "ms both";
+        }
+        slot.appendChild(g);
+        el.appendChild(slot);
+      }
+    }
+
+    function roll(el, value, order) {
+      if (el.childElementCount !== value.length) { build(el, value, order); return; }
+      for (let i = 0; i < value.length; i++) {
+        const slot = el.children[i];
+
+        /* Settle whatever the last roll left behind before starting another.
+           Without this the outgoing glyph of an in-flight roll survives — the
+           cell ends up reading "343" — and the old timer wipes the new
+           animation off a glyph it no longer owns. */
+        if (slot.rollTimer) { clearTimeout(slot.rollTimer); slot.rollTimer = null; }
+        while (slot.childElementCount > 1) slot.removeChild(slot.firstElementChild);
+
+        if (slot.dataset.v === value[i]) continue;
+        slot.dataset.v = value[i];
+
+        const out = slot.lastElementChild;
+        const inc = glyph(value[i]);
+        slot.appendChild(inc);
+        if (still) { out.remove(); continue; }
+
+        const delay = i * STEP;
+        out.style.animation = "digit-out " + ROLL + "ms var(--ease) " + delay + "ms both";
+        inc.style.animation = "digit-in " + ROLL + "ms var(--ease) " + delay + "ms both";
+        slot.rollTimer = setTimeout(function () {
+          slot.rollTimer = null;
+          out.remove();
+          inc.style.animation = "";
+        }, delay + ROLL + 40);
+      }
     }
 
     function tick() {
       const left = Math.max(0, ELECTION_CLOSE - Date.now());
       const total = Math.floor(left / 1000);
-      paint(cd.d, pad(Math.floor(total / 86400)));
-      paint(cd.h, pad(Math.floor((total % 86400) / 3600)));
-      paint(cd.m, pad(Math.floor((total % 3600) / 60)));
-      paint(cd.s, pad(total % 60));
+      roll(cd.d, pad(Math.floor(total / 86400)), 0);
+      roll(cd.h, pad(Math.floor((total % 86400) / 3600)), 1);
+      roll(cd.m, pad(Math.floor((total % 3600) / 60)), 2);
+      roll(cd.s, pad(total % 60), 3);
       if (left === 0) return;
       setTimeout(tick, 1000 - (Date.now() % 1000));
     }

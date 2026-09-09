@@ -729,37 +729,50 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 }
 .star.is-on { opacity: 1; background: var(--color-text-neutral-bold); }
 
+/* The in-feed slot is the same ad unit as the rails, laid on its side: the
+   frame draws no ad inside the feed, so it borrows the rail's treatment
+   rather than inventing a second one. */
 .ad-slot {
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.ad-slot__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-neutral-subtlest);
+}
+.ad-slot__box {
+  width: 100%;
+  height: 130px;
   background: var(--color-background-neutral-subtle);
   border: 1px solid var(--color-border-neutral-bold);
-  height: 130px;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #a3a3a3;
 }
 
 
+/* The rail follows the feed down the page. 64 clears the sticky header (64
+   tall) with 24 to spare. */
 .coverage__rail {
   flex: none;
   width: 304px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-lg);
+  gap: 10px;
+  position: sticky;
+  top: 88px;
+  align-self: flex-start;
 }
+/* The ad unit as the frame draws it: 12px label in subtlest, no tracking and
+   no transform (the string is already uppercase), over a 304x552 square-
+   cornered #151515 box with a #292929 hairline. */
 .coverage__rail-label {
   font-size: var(--font-size-xs);
-  letter-spacing: 0.04em;
   color: var(--color-text-neutral-subtlest);
 }
 .coverage__rail-box {
   width: 304px;
   height: 552px;
-  border-radius: var(--radius-sm);
   background: var(--color-background-neutral-subtle);
   border: 1px solid var(--color-border-neutral-bold);
 }
@@ -1402,7 +1415,7 @@ body.is-locked {
 .chip-menu,
 .map-zoom__btn,
 .dwplus,
-.ad-slot,
+.ad-slot__box,
 .coverage__rail-box,
 .site-header,
 .site-footer,
@@ -1756,15 +1769,54 @@ body.is-locked {
   display: flex;
   justify-content: space-between;
   gap: var(--space-6xl);
+  /* .hero spaces everything 48 apart; the countdown belongs to the rule above
+     it and wants air before the forecast below */
+  margin-top: calc(var(--space-3xl) * -1);
+  margin-bottom: var(--space-5xl);
 }
 .countdown__cell { display: flex; flex-direction: column; align-items: center; }
 .countdown__cell u {
   text-decoration: none;
-  font-size: var(--font-size-4xl, 48px);
+  font-size: 64px;
   font-weight: var(--font-weight-regular);
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
   color: var(--color-text-neutral-bold);
+}
+
+/* One slot per numeral, each its own overflow box, so a digit can roll in
+   from above while the one it replaces leaves downwards. 1ch is exact here
+   because the figures are tabular. */
+.digit {
+  position: relative;
+  display: inline-block;
+  width: 1ch;
+  height: 1.2em;
+  overflow: hidden;
+  vertical-align: top;
+}
+.digit__glyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* The glyphs stay solid across most of the travel — fading both halves
+   evenly left the digit nearly invisible at the crossover, which read as a
+   flicker rather than a roll. The slot's own overflow does the hiding. */
+@keyframes digit-in {
+  from { transform: translateY(-100%); opacity: 0; }
+  35%  { opacity: 1; }
+  to   { transform: none; opacity: 1; }
+}
+@keyframes digit-out {
+  from { transform: none; opacity: 1; }
+  65%  { opacity: 1; }
+  to   { transform: translateY(100%); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .digit__glyph { animation: none !important; }
 }
 .countdown__cell span {
   font-size: var(--font-size-xl);
@@ -1816,7 +1868,26 @@ body.is-locked {
 .seatsgrid i {
   aspect-ratio: 1;
   border-radius: var(--radius-full);
-  transition: background-color var(--dur-medium) var(--ease);
+  /* the dot has to be able to lift over its neighbours, so it is positioned
+     and scales about its own centre rather than nudging the grid */
+  position: relative;
+  transform-origin: center;
+  transition:
+    background-color var(--dur-medium) var(--ease),
+    transform var(--dur-short) var(--ease),
+    box-shadow var(--dur-short) var(--ease);
+}
+.seatsgrid i:hover {
+  transform: scale(1.9);
+  z-index: 2;
+  box-shadow: 0 0 0 1px var(--color-background-neutral-bold);
+}
+/* the row either side eases out of the way of the one under the cursor */
+.seatsgrid i:hover + i,
+.seatsgrid i:has(+ i:hover) { transform: scale(1.35); z-index: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .seatsgrid i, .seatsgrid i:hover { transition: none; transform: none; }
 }
 
 @media (max-width: 900px) {
@@ -1828,8 +1899,12 @@ body.is-locked {
     white-space: nowrap;
   }
   .hero__mark { width: 78px; height: 67px; }
-  .countdown { gap: var(--space-md); }
-  .countdown__cell u { font-size: var(--font-size-xl); }
+  .countdown {
+    gap: var(--space-md);
+    margin-top: calc(var(--space-lg) * -1);
+    margin-bottom: var(--space-3xl);
+  }
+  .countdown__cell u { font-size: var(--font-size-2xl); }
   .countdown__cell span { font-size: var(--font-size-xs); }
   .statement { flex-direction: column; align-items: flex-start; gap: var(--space-3xl); }
   .statement__text { font-size: var(--font-size-xl); }
