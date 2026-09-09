@@ -16,14 +16,14 @@
      the element at the end, or the dots would keep the entrance transform
      and their hover would have nothing left to animate. */
   const INTRO = {
-    title: 80,
-    mark: 240,
-    presented: 420,
-    rule: 460,
-    countdown: 620,
-    statement: 900,
-    margin: 1000,
-    dots: 1120
+    title: 40,
+    mark: 140,
+    presented: 230,
+    rule: 260,
+    countdown: 360,
+    statement: 520,
+    margin: 580,
+    dots: 660
   };
   const introStill = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   window.EH_INTRO_AT = function (key) { return introStill ? 0 : (INTRO[key] || 0); };
@@ -54,7 +54,7 @@
 
   if (!introStill) {
     const title = document.querySelector(".hero__title");
-    if (title) splitLetters(title, INTRO.title, 42);
+    if (title) splitLetters(title, INTRO.title, 26);
     rise(".hero__mark", INTRO.mark);
     rise(".hero__presented", INTRO.presented);
     rise(".statement__text", INTRO.statement);
@@ -797,14 +797,13 @@
        up in the intro because renderSeats rewrites this text itself. */
     if (seatsIntro) {
       seatsIntro = false;
-      if (marginBig) splitLetters(marginBig, INTRO.margin, 70);
-      /* a diagonal wave: the dot's delay follows row + column, so the fill
-         sweeps from the top-left corner rather than crawling row by row */
+      if (marginBig) splitLetters(marginBig, INTRO.margin, 44);
+      /* row by row, top to bottom: the delay follows the row alone, so each
+         line of dots grows in together and the fill reads as it fills down */
       const dots = seatsGrid.children;
       for (let i = 0; i < dots.length; i++) {
-        const wave = Math.floor(i / cols) + (i % cols);
-        dots[i].style.animation = "dot-in 520ms var(--ease) " +
-          (INTRO.dots + wave * 13) + "ms backwards";
+        dots[i].style.animation = "dot-in 380ms var(--ease) " +
+          (INTRO.dots + Math.floor(i / cols) * 34) + "ms backwards";
       }
     }
   }
