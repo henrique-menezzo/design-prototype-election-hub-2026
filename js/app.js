@@ -6,6 +6,63 @@
   const root = document.documentElement;
   const STORAGE_KEY = "dw-election-theme";
 
+  /* ============================== INTRO ==============================
+     One curtain-up on load: the headline sets itself letter by letter, the
+     rule wipes out from the left, the countdown rolls in, the forecast rises
+     and the seats grid fills as a diagonal wave. The whole thing is one
+     shared timeline, so every part knows when the part before it lands.
+
+     Every animation uses `backwards`, never `both`: the fill has to release
+     the element at the end, or the dots would keep the entrance transform
+     and their hover would have nothing left to animate. */
+  const INTRO = {
+    title: 80,
+    mark: 240,
+    presented: 420,
+    rule: 460,
+    countdown: 620,
+    statement: 900,
+    margin: 1000,
+    dots: 1120
+  };
+  const introStill = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.EH_INTRO_AT = function (key) { return introStill ? 0 : (INTRO[key] || 0); };
+
+  /* Letters get their own inline-blocks. Spaces stay text nodes so the words
+     still break and measure normally. */
+  function splitLetters(el, base, step) {
+    const text = el.textContent;
+    el.textContent = "";
+    let n = 0;
+    for (const ch of text) {
+      if (ch === " " || ch === "\n") { el.appendChild(document.createTextNode(" ")); continue; }
+      const s = document.createElement("span");
+      s.className = "letter";
+      s.textContent = ch;
+      s.style.animationDelay = (base + n * step) + "ms";
+      el.appendChild(s);
+      n++;
+    }
+  }
+
+  function rise(sel, delay) {
+    const el = typeof sel === "string" ? document.querySelector(sel) : sel;
+    if (!el) return;
+    el.classList.add("intro-rise");
+    el.style.animationDelay = delay + "ms";
+  }
+
+  if (!introStill) {
+    const title = document.querySelector(".hero__title");
+    if (title) splitLetters(title, INTRO.title, 42);
+    rise(".hero__mark", INTRO.mark);
+    rise(".hero__presented", INTRO.presented);
+    rise(".statement__text", INTRO.statement);
+
+    const rule = document.querySelector(".hero__rule");
+    if (rule) { rule.classList.add("intro-wipe"); rule.style.animationDelay = INTRO.rule + "ms"; }
+  }
+
   /* ============================= THEME ============================== */
   const stored = (function () {
     try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
@@ -85,7 +142,8 @@
         const g = glyph(value[i]);
         if (!still) {
           g.style.animation = "digit-in " + ROLL + "ms var(--ease) " +
-            ((order * value.length + i) * STEP) + "ms both";
+            (window.EH_INTRO_AT("countdown") + (order * value.length + i) * STEP) +
+            "ms both";
         }
         slot.appendChild(g);
         el.appendChild(slot);
@@ -684,6 +742,7 @@
   const DOT_MIN = 9;
 
   const seatsGrid = document.getElementById("seatsGrid");
+  let seatsIntro = !introStill;
   const marginBig = document.getElementById("marginBig");
   const pickPct = document.getElementById("pickPct");
   const pickSourceLabel = document.getElementById("pickSourceLabel");
@@ -732,6 +791,22 @@
       const lead = seats.rep >= seats.dem ? "R" : "D";
       marginBig.textContent = lead + Math.abs(seats.rep - seats.dem);
     }
+
+    /* Only the first deal is an entrance. Re-dealing on a race change or a
+       resize must not replay it, and the split has to happen here rather than
+       up in the intro because renderSeats rewrites this text itself. */
+    if (seatsIntro) {
+      seatsIntro = false;
+      if (marginBig) splitLetters(marginBig, INTRO.margin, 70);
+      /* a diagonal wave: the dot's delay follows row + column, so the fill
+         sweeps from the top-left corner rather than crawling row by row */
+      const dots = seatsGrid.children;
+      for (let i = 0; i < dots.length; i++) {
+        const wave = Math.floor(i / cols) + (i % cols);
+        dots[i].style.animation = "dot-in 520ms var(--ease) " +
+          (INTRO.dots + wave * 13) + "ms backwards";
+      }
+    }
   }
 
   /* The column count is width-dependent now, so the grid has to be re-dealt
@@ -742,7 +817,14 @@
   function redealIfResized() {
     if (!seatsGrid) return;
     const w = seatsGrid.clientWidth;
-    if (w && w !== dealtAt) { dealtAt = w; updateSeatbar(); }
+    if (!w || w === dealtAt) return;
+    const first = dealtAt === 0;
+    dealtAt = w;
+    /* The observer's first callback fires straight after the initial deal, at
+       the same width. Re-dealing there would throw away the entrance wave
+       before a single dot had moved. */
+    if (first) return;
+    updateSeatbar();
   }
   if (seatsGrid && window.ResizeObserver) {
     new ResizeObserver(redealIfResized).observe(seatsGrid);

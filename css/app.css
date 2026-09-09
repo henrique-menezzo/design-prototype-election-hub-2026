@@ -1816,6 +1816,32 @@ body.is-locked {
   color: var(--color-text-neutral-subtlest);
 }
 
+/* ---- Entrance ----------------------------------------------------------
+   Runs once, on load. Every one of these uses `backwards`, not `both`: the
+   fill has to let go at the end, or the seats grid would hold its entrance
+   transform and the hover would have nothing left to scale. */
+.letter {
+  display: inline-block;
+  animation: rise-in 620ms var(--ease) backwards;
+}
+.intro-rise { animation: rise-in 620ms var(--ease) backwards; }
+.intro-wipe {
+  transform-origin: left center;
+  animation: wipe-in 520ms var(--ease) backwards;
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(0.42em); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes wipe-in {
+  from { transform: scaleX(0); }
+  to   { transform: none; }
+}
+@keyframes dot-in {
+  from { opacity: 0; transform: scale(0.1); }
+  to   { opacity: 1; transform: none; }
+}
+
 /* Statement: one 48px sentence on three lines, with source and chamber as
    inline pickers, and the projected margin oversized on the right. */
 .statement {
