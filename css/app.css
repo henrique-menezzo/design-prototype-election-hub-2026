@@ -550,6 +550,9 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   border-radius: var(--radius-full);
   object-fit: cover;
 }
+/* a show's cover is a square, not a face — the frame draws the episode card
+   with a Show Thumbnail where the others carry a Host Image */
+.card[data-kind="episode"] .card__avatar { border-radius: var(--radius-md); }
 .card__avatar--initials {
   display: grid;
   place-items: center;
@@ -607,18 +610,6 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 }
 .card__mute .icon { width: 24px; height: 24px; }
 
-.card__badge {
-  position: absolute;
-  right: var(--space-lg);
-  bottom: var(--space-lg);
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--color-overlay-neutral-strong) 60%, transparent);
-  backdrop-filter: blur(30px);
-  font-size: var(--font-size-sm);
-  line-height: 1;
-  color: var(--color-text-always-light);
-}
 .card__flag {
   position: absolute;
   top: var(--space-lg); left: var(--space-lg);
@@ -878,6 +869,15 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   /* the avatar gutter is worth 48px of a 393 screen only on desktop */
   .card { gap: var(--space-md); }
   .card__avatar { width: 32px; height: 32px; }
+  /* Twitter's alignment: the meta line starts at the avatar's top rather than
+     centring against it, and the block below closes up, so avatar, byline and
+     post read as one column. The dots button is pulled back onto the line it
+     would otherwise stretch. */
+  .card__meta { min-height: 0; align-items: flex-start; }
+  .meta-list { padding-top: 2px; }
+  .card__meta .icon-btn { margin-top: -6px; }
+  .card__main { gap: var(--space-md); }
+  .card__text { gap: var(--space-md); }
   .card__avatar--initials { font-size: var(--font-size-xs); }
   .card__title { font-size: var(--font-size-lg); line-height: 1.25; }
   .card__main > .card__media { margin-top: var(--space-xl); }
@@ -940,6 +940,11 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
    inverse-coloured outline, neighbours recede. */
 .usmap { --sel-stroke: 2; }
 .state .st { transition: fill var(--dur-medium) var(--ease), filter var(--dur-short) var(--ease); }
+/* on a race/source swap each state waits for its own x before recolouring, so
+   the new map sweeps in from the left instead of flipping in one frame */
+.map-card.is-swapping .state .st {
+  transition: fill var(--dur-long) var(--ease) var(--swap-delay, 0ms);
+}
 .state { outline: none; }
 .state:focus-visible .st {
   stroke: var(--color-border-inverse-bold);

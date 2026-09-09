@@ -8,6 +8,12 @@
 
   /* The map and its boxes are fetched, not linked, so they miss the query the
      stylesheet links carry — and Pages caches them for ten minutes. */
+  /* Raised by setRace/setSource so only a deliberate change animates — a
+     resize or a panel repaint must not replay it. Declared up here because
+     renderSeats reads it, and that runs before the map's own block. */
+  let swapping = false;
+  let swapTimer = null;
+
   function assetV() {
     return window.EH_ASSET_V ? "?v=" + window.EH_ASSET_V : "";
   }
@@ -800,6 +806,17 @@
     /* Only the first deal is an entrance. Re-dealing on a race change or a
        resize must not replay it, and the split has to happen here rather than
        up in the intro because renderSeats rewrites this text itself. */
+    if (!seatsIntro && swapping && !introStill) {
+      /* the swap's wave is the entrance's, run short and flat — it should
+         read as the grid re-forming, not as the page opening again */
+      const dots = seatsGrid.children;
+      for (let i = 0; i < dots.length; i++) {
+        const jitter = ((i * 2654435761) % 1000) / 1000 * 90;
+        dots[i].style.animation = "dot-in 300ms var(--dot-ease) " +
+          Math.round(Math.floor(i / cols) * 12 + jitter) + "ms backwards";
+      }
+    }
+
     if (seatsIntro) {
       seatsIntro = false;
       if (marginBig) splitLetters(marginBig, INTRO.margin, 44);
@@ -847,11 +864,29 @@
   /* Repaints the whole map for the current race/source. */
   function repaint() {
     if (!svg) return;
+    /* The states repaint on a left-to-right sweep rather than all at once:
+       the delay is the state's own x, so the new map reads as arriving. */
+    const box = svg.getBoundingClientRect();
     svg.querySelectorAll(".state").forEach(function (g) {
       const code = g.dataset.state;
       const next = window.EH.ratingFor(code, baseRating[code], race, source);
+      if (swapping && !introStill && box.width) {
+        const r = g.getBoundingClientRect();
+        const at = Math.round((r.left + r.width / 2 - box.left) / box.width * 260);
+        g.style.setProperty("--swap-delay", at + "ms");
+      } else {
+        g.style.removeProperty("--swap-delay");
+      }
       g.setAttribute("class", "state r-" + next + (g.classList.contains("is-selected") ? " is-selected" : ""));
     });
+    if (swapping && !introStill) {
+      card.classList.add("is-swapping");
+      clearTimeout(swapTimer);
+      swapTimer = setTimeout(function () {
+        card.classList.remove("is-swapping");
+        svg.querySelectorAll(".state").forEach(function (g) { g.style.removeProperty("--swap-delay"); });
+      }, 900);
+    }
     rebuildBallot();
     updateSeatbar();
     if (selected) renderPanel(selected);
@@ -862,7 +897,9 @@
     race = id;
     if (raceValue) raceValue.textContent = label(window.EH.races, id);
     fillMenu(raceMenu, window.EH.races, race, setRace);
+    swapping = true;
     repaint();
+    swapping = false;
   }
 
   function setSource(id) {
@@ -870,7 +907,9 @@
     source = id;
     if (sourceValue) sourceValue.textContent = label(window.EH.sources, id);
     fillMenu(sourceMenu, window.EH.sources, source, setSource);
+    swapping = true;
     repaint();
+    swapping = false;
   }
 
   if (raceMenu) fillMenu(raceMenu, window.EH.races, race, setRace);
