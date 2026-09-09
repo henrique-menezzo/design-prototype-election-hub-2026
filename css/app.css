@@ -1759,6 +1759,13 @@ body.is-locked {
   color: var(--color-text-neutral-subtlest);
 }
 .hero__presented img { height: 18px; width: auto; }
+/* The wordmark ships as a white-on-transparent PNG, so it vanishes on the
+   light surface. It is pure white plus alpha, so a straight invert lands on
+   pure black — no need for a second asset. */
+:root[data-theme="light"] .hero__presented img { filter: invert(1); }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .hero__presented img { filter: invert(1); }
+}
 
 .hero__mark { flex: none; width: 130px; height: 111px; }
 
