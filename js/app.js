@@ -620,6 +620,11 @@
      Flagged rather than silently split the difference. */
   const CHAMBER_SEATS = { house: 435, senate: 100, governor: 36 };
   const SEATS_PER_ROW = 54;
+  const DOT_GAP = 3.48;
+  /* 54 columns is the frame's geometry, and it only works at the frame's
+     width. On a 393 phone the same 54 columns leave a 3px dot, which reads
+     as noise — so the column count drops until the dot is legible. */
+  const DOT_MIN = 9;
 
   const seatsGrid = document.getElementById("seatsGrid");
   const marginBig = document.getElementById("marginBig");
@@ -643,7 +648,12 @@
   function renderSeats(seats) {
     if (!seatsGrid) return;
     const total = CHAMBER_SEATS[race] || CHAMBER_SEATS.house;
-    const cols = Math.min(SEATS_PER_ROW, total);
+    let cols = Math.min(SEATS_PER_ROW, total);
+    const box = seatsGrid.clientWidth;
+    if (box) {
+      const fits = Math.floor((box + DOT_GAP) / (DOT_MIN + DOT_GAP));
+      cols = Math.max(10, Math.min(cols, fits));
+    }
     seatsGrid.style.setProperty("--cols", cols);
 
     const sum = seats.dem + seats.toss + seats.rep || 1;
@@ -666,6 +676,24 @@
       marginBig.textContent = lead + Math.abs(seats.rep - seats.dem);
     }
   }
+
+  /* The column count is width-dependent now, so the grid has to be re-dealt
+     when its box changes. A ResizeObserver rather than window.resize: this
+     also catches the rails coming and going. Guarded on the width it last
+     dealt at, since re-dealing changes the grid's own height. */
+  let dealtAt = 0;
+  function redealIfResized() {
+    if (!seatsGrid) return;
+    const w = seatsGrid.clientWidth;
+    if (w && w !== dealtAt) { dealtAt = w; updateSeatbar(); }
+  }
+  if (seatsGrid && window.ResizeObserver) {
+    new ResizeObserver(redealIfResized).observe(seatsGrid);
+  }
+  /* window.resize as well as the observer: a backgrounded tab suspends the
+     rendering steps the observer rides on, and the grid must be right by the
+     time the tab is looked at again. */
+  window.addEventListener("resize", redealIfResized);
 
   /* Repaints the whole map for the current race/source. */
   function repaint() {

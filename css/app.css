@@ -494,15 +494,16 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
 
 /* ======================= COVERAGE ======================= */
 
+/* Two 304 rails flanking the 608 feed, 48 either side — 304+48+608+48+304 is
+   exactly the frame's 1312 of content. */
 .coverage {
   display: flex;
-  gap: 84px;
-  padding-inline: var(--space-xl);
+  gap: var(--space-6xl);
   margin-top: 96px;
   padding-bottom: var(--space-9xl);
 }
 
-.coverage__main { flex: 1 1 808px; min-width: 0; display: flex; flex-direction: column; gap: 39px; }
+.coverage__main { flex: 1 1 608px; min-width: 0; display: flex; flex-direction: column; gap: 39px; }
 
 .coverage__head { display: flex; flex-direction: column; gap: 14px; }
 .coverage__title {
@@ -741,15 +742,6 @@ h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
   color: #a3a3a3;
 }
 
-/* In Figma the block is [main 808] · 84 · [line] · 84 · [rail 304], inside the
-   1312 with 16 of padding. The line is its own element: using border-left on
-   the rail pushed the rule up against the feed text. */
-.coverage__divider {
-  flex: none;
-  width: 1px;
-  align-self: stretch;
-  background: var(--color-border-neutral-bold);
-}
 
 .coverage__rail {
   flex: none;
@@ -1415,7 +1407,6 @@ body.is-locked {
 .site-header,
 .site-footer,
 .game-bar,
-.coverage__divider,
 .day-group__label,
 .seatbar {
   transition:
@@ -1829,7 +1820,13 @@ body.is-locked {
 }
 
 @media (max-width: 900px) {
-  .hero__title { font-size: var(--font-size-3xl); }
+  /* one line, always: 393 minus 16 of padding either side and the 78 mark
+     leaves ~250, and "The Midterms" needs the size to follow the box rather
+     than break in two. */
+  .hero__title {
+    font-size: clamp(26px, 8.6vw, var(--font-size-3xl));
+    white-space: nowrap;
+  }
   .hero__mark { width: 78px; height: 67px; }
   .countdown { gap: var(--space-md); }
   .countdown__cell u { font-size: var(--font-size-xl); }
